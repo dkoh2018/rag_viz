@@ -4,21 +4,42 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { traceable } from 'langsmith/traceable';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { performResearch } from './research-tools';
 import * as path from 'path';
 import * as fs from 'fs';
 
 // Expert-level system prompts optimized for clarity, with all agents included for visual tracing.
 export const VISUAL_TRACE_SYSTEM_PROMPTS = {
-  'router-agent': `You are a Router Agent. Your sole purpose is to classify an incoming user query into one of two categories: 'simple' or 'complex'. Your analysis must be swift and accurate for the system diagram.
+  'router-agent': `You are a high-speed Router Agent. Your sole purpose is to classify an incoming query as either 'simple' or 'complex'.
+
+## Objective:
+Analyze the user's query to determine the correct processing pipeline, paying close attention to whether the query requires current information.
 
 ## Categories:
-- 'simple': The query asks for a specific, factual piece of information.
-- 'complex': The query requires multi-step reasoning, synthesis, or comparison.
+- 'simple': The query can be answered with a single, stable fact or a standard, concise explanation that does not change over time. This also includes nonsensical or unclear queries.
+- 'complex': The query requires step-by-step instructions, synthesis of information from multiple sources, or **information that must be current or recent**. If the answer changes from month to month or year to year, it is complex.
 
 ## Instructions:
-1.  Analyze the user query.
-2.  Respond with ONLY the single word 'simple' or 'complex'. Do not add any other text.`,
+1.  Read the user's query.
+2.  First, ask yourself: "Does this question need up-to-date information to be answered correctly?" If yes, classify it as 'complex'.
+3.  If the answer is stable, then ask if it's a single fact ('simple') or requires a detailed explanation/steps ('complex').
+4.  If a query is incomplete or nonsensical, classify it as 'simple'.
+5.  Respond with ONLY the single word: 'simple' or 'complex'.
+6.  Do not add explanations. Your output must be a single word.
+
+## Examples:
+
+# Simple: Stable facts, common knowledge, or unclear queries
+- Query: "who is the president of the united states" -> simple
+- Query: "why is the sky blue" -> simple
+- Query: "whats 2+2" -> simple
+- Query: "what's 2+@" -> simple
+
+# Complex: Requires steps, detailed explanation, or current information
+- Query: "what's machine learning" -> complex
+- Query: "how do i tie a tie" -> complex
+- Query: "compare react and angular" -> complex
+- Query: "what were the best phones released this year" -> complex
+- Query: "latest news about space exploration" -> complex`,
 
   'direct-generation': `You are a Direct Answer Agent. Your task is to provide direct, concise answers to simple questions using your knowledge.
 
@@ -99,8 +120,7 @@ export const processVisualRAGQuery = traceable(
   async (
     agentId: keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, 
     userQuery: string, 
-    context: string = "",
-    researchModel: 'exa' | 'perplexity' | 'local' = 'exa'
+    context: string = ""
   ): Promise<string> => {
     console.log(`🚀 [VISUAL TRACE] Running agent "${agentId}"`);
     
@@ -152,3 +172,6 @@ Final Response: "${context}"`;
   },
   { name: 'processVisualRAGQuery', tags: ['rag', 'visual-trace', 'langchain'] }
 );
+
+// Export the vector search function for potential use
+export { performSimpleVectorSearch };
