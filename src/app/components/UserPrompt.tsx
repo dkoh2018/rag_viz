@@ -6,16 +6,16 @@ import styles from '../visualization.module.css';
 
 interface UserPromptProps {
   node: NodeData;
+  onPromptSubmit: (prompt: string) => void;
 }
 
-export default function UserPrompt({ node }: UserPromptProps) {
+export default function UserPrompt({ node, onPromptSubmit }: UserPromptProps) {
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   const handleSend = () => {
     if (prompt.trim()) {
-      console.log('Sending prompt:', prompt);
-      // TODO: Add your prompt handling logic here
+      onPromptSubmit(prompt.trim());
       setPrompt('');
       setIsTyping(false);
     }

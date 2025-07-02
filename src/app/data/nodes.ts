@@ -12,85 +12,85 @@ export const nodes: NodeData[] = [
   {
     id: 'user-prompt',
     label: 'User Prompt',
-    content: 'Initial user query that starts the RAG process. This can be a simple question requiring direct retrieval or a complex multi-step query that needs decomposition and orchestration across multiple specialized agents.',
+    content: 'What is machine learning and how does it work?',
     position: { left: '20px', top: '700px' }
   },
   {
     id: 'router-agent',
     label: 'Router Agent',
-    content: 'Analyzes incoming queries to determine processing path. Routes simple queries directly to generation while complex queries are sent to the orchestrator for decomposition and multi-agent coordination.',
+    content: '🔀 ROUTING ANALYSIS: Query "What is machine learning and how does it work?" classified as complex - routing to orchestrator for multi-agent processing.',
     position: { left: '600px', top: '700px' }
   },
   {
     id: 'direct-generation',
     label: 'Direct Generation',
-    content: 'Handles straightforward queries that can be answered with simple retrieval and generation. Bypasses complex orchestration for efficiency when dealing with basic information requests.',
+    content: '🎯 DIRECT RESPONSE: For simple query "What is machine learning and how does it work?" - Retrieved relevant docs and generated: This is a direct answer based on knowledge base retrieval.',
     position: { left: '4000px', top: '500px' }
   },
   {
     id: 'orchestrator-agent',
     label: 'Orchestrator Agent',
-    content: 'Manages complex query workflows by coordinating multiple worker agents. Handles task distribution, monitors progress, and ensures all sub-tasks are completed before synthesis begins.',
+    content: '🎭 ORCHESTRATION: Breaking down complex query "What is machine learning and how does it work?" into sub-tasks: [retrieval], [research], [analysis]. Coordinating worker agents...',
     position: { left: '1000px', top: '1000px' }
   },
   {
     id: 'decompose-query',
     label: 'Decompose Query',
-    content: 'Breaks down complex queries into smaller, manageable sub-tasks. Each sub-task is assigned to appropriate worker agents based on the type of processing required (retrieval, research, analysis).',
+    content: '🔄 DECOMPOSITION: Query "What is machine learning and how does it work?" split into:\n1. Information retrieval task\n2. Research analysis task\n3. Data processing task',
     position: { left: '1650px', top: '1000px' }
   },
   {
     id: 'worker-retrieval',
     label: 'Worker Agent: Retrieval',
-    content: 'Specialized in retrieving relevant documents and information from knowledge bases. Uses semantic search and vector similarity to find the most relevant context for the given query.',
+    content: '📚 RETRIEVAL COMPLETE: Found 15 relevant documents for "What is machine learning and how does it work?". Top matches: knowledge_base_doc_1.pdf, research_paper_3.pdf, manual_section_7.md',
     position: { left: '2350px', top: '600px' }
   },
   {
     id: 'worker-research',
     label: 'Worker Agent: Research',
-    content: 'Conducts deeper research tasks that require multiple sources and cross-referencing. Handles complex information gathering that goes beyond simple document retrieval.',
+    content: '🔍 RESEARCH COMPLETE: Cross-referenced 8 sources for "What is machine learning and how does it work?". Identified 3 key themes and 2 potential contradictions requiring synthesis.',
     position: { left: '2350px', top: '1000px' }
   },
   {
     id: 'worker-analysis',
     label: 'Worker Agent: Analysis',
-    content: 'Performs analytical tasks such as data interpretation, comparison, and reasoning. Processes retrieved information to extract insights and patterns relevant to the query.',
+    content: '📊 ANALYSIS COMPLETE: Processed data for "What is machine learning and how does it work?". Generated insights: 85% confidence score, 3 supporting arguments, 1 limitation identified.',
     position: { left: '2350px', top: '1400px' }
   },
   {
     id: 'shared-state',
     label: 'Shared State',
-    content: 'Central coordination point where all worker agents contribute their findings. Maintains consistency across the distributed processing and provides a unified view of all gathered information.',
+    content: '🗃️ STATE UPDATE: Consolidated findings from all workers for "What is machine learning and how does it work?". Retrieved: 15 docs, Research: 8 sources, Analysis: 85% confidence. Ready for synthesis.',
     position: { left: '3000px', top: '1000px' }
   },
   {
     id: 'synthesis-agent',
     label: 'Synthesis Agent',
-    content: 'Combines information from all worker agents into a coherent response. Handles deduplication, conflict resolution, and ensures the final response addresses all aspects of the original query.',
+    content: '⚡ SYNTHESIS COMPLETE: Combined all worker outputs for "What is machine learning and how does it work?". Generated coherent response integrating retrieval, research, and analysis findings.',
     position: { left: '3650px', top: '1000px' }
   },
   {
     id: 'evaluator-agent',
     label: 'Evaluator Agent',
-    content: 'Assesses the quality and completeness of the synthesized response. Checks for accuracy, relevance, and completeness. May trigger refinement loops if the response doesn\'t meet quality thresholds.',
+    content: '✅ EVALUATION: Response for "What is machine learning and how does it work?" scored: Accuracy: 89%, Completeness: 92%, Relevance: 95%. VERDICT: Approved for delivery.',
     position: { left: '4200px', top: '1200px' }
   },
   {
     id: 'response-delivery',
     label: 'Response Delivery',
-    content: 'Final stage that formats and delivers the response to the user. Handles response formatting, citation management, and ensures the response is presented in the most appropriate format.',
+    content: '📤 DELIVERING: Final response for "What is machine learning and how does it work?" formatted with citations, confidence scores, and source references. Ready for user.',
     position: { left: '4750px', top: '850px' }
   },
   {
     id: 'langsmith-logging',
     label: 'LangSmith Logging',
-    content: 'Comprehensive logging and monitoring system that tracks all agent interactions, performance metrics, and system behavior. Provides observability for debugging and optimization.',
+    content: '📋 LOGGED: Session for "What is machine learning and how does it work?" - 14 agent interactions, 2.3s total latency, 0 errors. Metrics captured for optimization.',
     position: { left: '5400px', top: '850px' }
   },
   {
     id: 'user-response',
     label: 'User Response',
-    content: 'Final response delivered to the user, incorporating all the processing, synthesis, and evaluation steps. Represents the culmination of the entire RAG workflow with comprehensive and accurate information.',
+    content: '💬 FINAL OUTPUT: Based on your query "What is machine learning and how does it work?", here is the comprehensive response generated through our RAG pipeline with full traceability and citations.',
     position: { left: '6050px', top: '850px' }
   }
 ];
