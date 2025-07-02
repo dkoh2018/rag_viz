@@ -68,7 +68,7 @@
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   z-index: 10;
   width: 450px;
-  height: 338px;
+  height: 250px;
   transition: all 0.2s ease-in-out;
 }
 
@@ -135,92 +135,6 @@
 
 .userPromptInput:focus {
   outline: none;
-}
-
-.userPromptDisabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.userPromptDisabled::placeholder {
-  color: #4b5563;
-}
-
-.controlButtons {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  display: flex;
-  gap: 12px;
-}
-
-.statusButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  font-family: var(--font-inter), sans-serif;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-/* Ready State - OpenAI style dark grey/transparent */
-.statusButtonReady {
-  background: rgba(55, 65, 81, 0.3);
-  color: #9ca3af;
-  cursor: not-allowed;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.statusButtonReady:disabled {
-  opacity: 0.7;
-}
-
-/* Stop State - Red for active processing */
-.statusButtonStop {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.statusButtonStop:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  transform: translateY(-1px);
-}
-
-.statusButtonStop:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-/* Reset Button - Always grey/transparent like Ready state */
-.resetButton {
-  background: rgba(55, 65, 81, 0.3);
-  color: #9ca3af;
-  cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.resetButton:hover {
-  background: rgba(55, 65, 81, 0.5);
-  color: #d1d5db;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
-}
-
-.resetButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sendButton {
