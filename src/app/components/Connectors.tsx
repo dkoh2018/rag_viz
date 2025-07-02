@@ -35,8 +35,7 @@ export default function Connectors() {
       <path d="M 3100 450 Q 3120 450 3300 540" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <path d="M 3100 680 Q 3120 680 3300 580" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <text x="3180" y="620" className={styles.connectorLabel}>Valid</text>
-
-      <path d="M 3800 570 L 3950 570" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 3790 570 L 3930 570" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <path d="M 2975 1050 L 2975 1500 L 700 1500 L 700 965" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <text x="2865" y="1125" className={styles.connectorLabel}>Needs Refinement</text>
       <text x="575" y="1000" className={styles.connectorLabel}>Needs Refinement</text>

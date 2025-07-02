@@ -636,6 +636,13 @@
   animation: activeProcessingGlow 2s ease-in-out infinite;
 }
 
+/* Simultaneous Worker Agent Glow - Yellow */
+.nodeSimultaneousWorking {
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 0 50px rgba(251, 191, 36, 0.4), 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border-color: rgba(251, 191, 36, 0.5);
+  animation: simultaneousWorkingGlow 2.5s ease-in-out infinite;
+}
+
 @keyframes activeProcessingGlow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3), 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -680,5 +687,14 @@
   }
   50% {
     box-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.5), 0 12px 35px -5px rgb(0 0 0 / 0.4);
+  }
+}
+
+@keyframes simultaneousWorkingGlow {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.6), 0 0 50px rgba(251, 191, 36, 0.4), 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.5), 0 8px 25px -5px rgb(0 0 0 / 0.3);
   }
 }

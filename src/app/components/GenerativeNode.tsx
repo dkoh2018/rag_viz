@@ -10,9 +10,10 @@ interface GenerativeNodeProps {
   isActiveProcessing?: boolean;
   isPipelineComplete?: boolean;
   showReadyGlow?: boolean;
+  isSimultaneousWorking?: boolean;
 }
 
-export default function GenerativeNode({ node, generatedContent, isLoading = false, isActiveProcessing = false, isPipelineComplete = false, showReadyGlow = false }: GenerativeNodeProps) {
+export default function GenerativeNode({ node, generatedContent, isLoading = false, isActiveProcessing = false, isPipelineComplete = false, showReadyGlow = false, isSimultaneousWorking = false }: GenerativeNodeProps) {
   // Determine node styling class based on state
   const getNodeClass = () => {
     let classes = styles.node;
@@ -20,6 +21,8 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
       classes += ` ${styles.nodeReadyStart}`;
     } else if (isPipelineComplete) {
       classes += ` ${styles.nodeCompletionGlow}`;
+    } else if (isSimultaneousWorking) {
+      classes += ` ${styles.nodeSimultaneousWorking}`;
     } else if (isActiveProcessing) {
       classes += ` ${styles.nodeActiveProcessing}`;
     } else if (isLoading) {
@@ -39,8 +42,9 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
       <div className={styles.nodeLabel}>
         {node.label}
         {isPipelineComplete && <span style={{ marginLeft: '8px', color: '#f59e0b' }}>✨ Complete!</span>}
-        {isActiveProcessing && !isPipelineComplete && <span style={{ marginLeft: '8px', color: '#3b82f6' }}>🔥 Processing...</span>}
-        {isLoading && !isActiveProcessing && !isPipelineComplete && <span style={{ marginLeft: '8px', color: '#9ca3af' }}>⏳ Loading...</span>}
+        {isSimultaneousWorking && !isPipelineComplete && <span style={{ marginLeft: '8px', color: '#f59e0b' }}>🔥 Working...</span>}
+        {isActiveProcessing && !isPipelineComplete && !isSimultaneousWorking && <span style={{ marginLeft: '8px', color: '#3b82f6' }}>🔥 Processing...</span>}
+        {isLoading && !isActiveProcessing && !isPipelineComplete && !isSimultaneousWorking && <span style={{ marginLeft: '8px', color: '#9ca3af' }}>⏳ Loading...</span>}
       </div>
       <div className={styles.generativeContainer}>
         {isLoading ? (

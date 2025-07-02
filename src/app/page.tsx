@@ -18,6 +18,7 @@ export default function RAGVisualization() {
   const [currentProcessingNode, setCurrentProcessingNode] = useState<string | null>(null);
   const [researchModel, setResearchModel] = useState<'exa' | 'perplexity' | 'local'>('exa');
   const [showFinalResponseGlow, setShowFinalResponseGlow] = useState(false);
+  const [isSimultaneousWorking, setIsSimultaneousWorking] = useState(false);
 
   // Helper functions for loading state management
   const addLoadingNode = (nodeId: string) => {
@@ -201,6 +202,10 @@ export default function RAGVisualization() {
         if (shouldStop) throw new Error('Stopped by user');
         console.log('🔄 Step 4: Worker Threads (sequential)');
         
+        // Start simultaneous working illusion - all workers glow yellow
+        setIsSimultaneousWorking(true);
+        console.log('✨ [UI ILLUSION] All worker agents now glowing simultaneously (yellow)');
+        
         // Step 4a: Retrieval Worker (gets research data)
         const retrievalResponse = await generateResponseWithLoading('worker-retrieval', prompt, checkShouldStop, controller.signal);
         updateContent('worker-retrieval', retrievalResponse);
@@ -212,6 +217,10 @@ export default function RAGVisualization() {
         // Step 4c: Analysis Worker (draws conclusions from research)
         const analysisResponse = await generateResponseWithLoading('worker-analysis', prompt, checkShouldStop, controller.signal, researchResponse);
         updateContent('worker-analysis', analysisResponse);
+        
+        // Stop simultaneous working illusion - analysis complete
+        setIsSimultaneousWorking(false);
+        console.log('🎯 [UI ILLUSION] Worker analysis complete - stopping simultaneous glow');
         
         // Step 5: Shared State (consolidate all worker outputs)
         if (shouldStop) throw new Error('Stopped by user');
@@ -402,6 +411,8 @@ ${analysisResponse}
                 />
               );
             } else {
+              const isWorkerAgent = node.id.includes('worker-');
+              
               return (
                 <GenerativeNode 
                   key={node.id} 
@@ -411,6 +422,7 @@ ${analysisResponse}
                   isActiveProcessing={currentProcessingNode === node.id}
                   isPipelineComplete={!isProcessing && generatedContent[node.id] && !showFinalResponseGlow}
                   showReadyGlow={node.id === 'response-delivery' && showFinalResponseGlow}
+                  isSimultaneousWorking={isWorkerAgent && isSimultaneousWorking}
                 />
               );
             }
