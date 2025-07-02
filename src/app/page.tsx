@@ -284,7 +284,7 @@ export default function RAGVisualization() {
         
         {/* Research Model Toggle Button */}
         <button 
-          className={`${styles.statusButton} ${styles.modelToggleButton}`}
+          className={`${styles.statusButton} ${styles.researchModelButton}`}
           onClick={handleResearchModelToggle}
           title={`Current: ${researchModel.toUpperCase()} - Click to cycle through research models`}
         >
@@ -312,6 +312,7 @@ export default function RAGVisualization() {
                   onPromptSubmit={handlePromptSubmit}
                   isProcessing={isProcessing}
                   submittedPrompt={userPrompt}
+                  showReadyGlow={!isProcessing && userPrompt === ''}
                 />
               );
             } else {
