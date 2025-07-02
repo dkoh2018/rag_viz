@@ -57,12 +57,6 @@ export const VISUAL_TRACE_SYSTEM_PROMPTS = {
 - Do NOT output any other text or information.
 - Your response must be the exact success message.`,
 
-  'user-response': `You are the Final Presentation Agent. You represent the last step where the system hands off the polished answer to the user interface.
-
-## Instructions:
-1. You will receive the final, formatted response in the <final_response> tags.
-2. Your job is to act as a final gate, simply passing this response through.
-3. Return the response exactly as you received it, without any changes or additions.`,
 };
 
 // Initialize lightweight LLM (no changes needed here)
@@ -135,9 +129,6 @@ Query: "${userQuery}"
 Final Response: "${context}"`;
           break;
 
-        case 'user-response':
-          humanMessageContent = `<final_response>${context}</final_response>`;
-          break;
       }
       
       const messages = [

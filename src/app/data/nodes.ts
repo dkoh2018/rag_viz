@@ -77,20 +77,16 @@ export const nodes: NodeData[] = [
   },
   {
     id: 'response-delivery',
-    label: 'Response Delivery',
-    content: 'Response Formatting: Structuring final output with proper citations, confidence indicators, and source attribution. Preparing user-facing response with transparency about information sources and limitations.',
-    position: { left: '3325px', top: '400px' }
+    label: 'User Response',
+    content: '💬 FINAL OUTPUT: Based on your query, here is the comprehensive response generated through our RAG pipeline with full traceability and citations.',
+    position: { left: '3325px', top: '400px' },
+    type: 'output',
+    category: 'delivery'
   },
   {
     id: 'langsmith-logging',
     label: 'LangSmith Logging',
     content: 'Observability Tracking: Recording complete session metadata including agent interactions, processing latency, error rates, and performance metrics for system optimization and debugging.',
-    position: { left: '3900px', top: '700px' }
-  },
-  {
-    id: 'user-response',
-    label: 'User Response',
-    content: 'Final Output: Comprehensive response delivered to user with full traceability through the RAG pipeline. Includes source citations, confidence metrics, and transparent indication of information provenance.',
-    position: { left: '3900px', top: '100px' }
+    position: { left: '3950px', top: '400px' }
   }
 ];

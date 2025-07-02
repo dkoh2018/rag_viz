@@ -91,10 +91,10 @@ export const RAG_NODES: NodeData[] = [
   },
   {
     id: 'response-delivery',
-    label: 'Response Delivery',
-    content: '📤 DELIVERING: Final response for "What is machine learning and how does it work?" formatted with citations, confidence scores, and source references. Ready for user.',
+    label: 'User Response',
+    content: '💬 FINAL OUTPUT: Based on your query "What is machine learning and how does it work?", here is the comprehensive response generated through our RAG pipeline with full traceability and citations.',
     position: { left: '4750px', top: '850px' },
-    type: 'processor',
+    type: 'output',
     category: 'delivery'
   },
   {
@@ -103,14 +103,6 @@ export const RAG_NODES: NodeData[] = [
     content: '📋 LOGGED: Session for "What is machine learning and how does it work?" - 14 agent interactions, 2.3s total latency, 0 errors. Metrics captured for optimization.',
     position: { left: '5400px', top: '850px' },
     type: 'processor',
-    category: 'delivery'
-  },
-  {
-    id: 'user-response',
-    label: 'User Response',
-    content: '💬 FINAL OUTPUT: Based on your query "What is machine learning and how does it work?", here is the comprehensive response generated through our RAG pipeline with full traceability and citations.',
-    position: { left: '6050px', top: '850px' },
-    type: 'output',
     category: 'delivery'
   }
 ];

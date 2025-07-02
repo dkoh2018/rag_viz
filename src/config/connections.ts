@@ -97,12 +97,6 @@ export const RAG_CONNECTIONS: ConnectionData[] = [
     path: 'M 5200 975 L 5400 975'
   },
   {
-    id: 'logging-to-user',
-    from: 'langsmith-logging',
-    to: 'user-response',
-    path: 'M 5850 975 L 6050 975'
-  },
-  {
     id: 'evaluator-feedback',
     from: 'evaluator-agent',
     to: 'orchestrator-agent',

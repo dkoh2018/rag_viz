@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     console.log(`🔬 [API] Research Model: ${researchModel.toUpperCase()}`);
 
     // Define which agents use simple vs complex processing
-    const simpleAgents = ['router-agent', 'direct-generation', 'response-delivery', 'langsmith-logging', 'user-response'];
+    const simpleAgents = ['router-agent', 'direct-generation', 'response-delivery', 'langsmith-logging'];
     const complexAgents = ['orchestrator-agent', 'decompose-query', 'worker-retrieval', 'worker-research', 'worker-analysis', 'shared-state', 'synthesis-agent', 'evaluator-agent'];
     
     let response: string;

@@ -103,11 +103,11 @@ export default function RAGVisualization() {
       const result = await generateResponse(nodeId, prompt, checkShouldStop, signal, researchModel, context);
       removeLoadingNode(nodeId);
       
-      // Keep user-response node glowing until pipeline complete
-      if (nodeId !== 'user-response') {
+      // Keep response-delivery node glowing until pipeline complete
+      if (nodeId !== 'response-delivery') {
         setActiveProcessingNode(null); // Clear active processing for other nodes
       }
-      // user-response stays active until pipeline completion
+      // response-delivery stays active until pipeline completion
       
       return result;
     } catch (error) {
@@ -178,12 +178,6 @@ export default function RAGVisualization() {
         console.log('🔄 Step 4: LangSmith Logging');
         const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
         updateContent('langsmith-logging', langsmithResponse);
-        
-        // Step 5: User Response
-        if (shouldStop) throw new Error('Stopped by user');
-        console.log('🔄 Step 5: User Response');
-        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
-        updateContent('user-response', userResponseResponse);
         
         console.log('✅ Simple Query Pipeline Complete!');
         
@@ -259,12 +253,6 @@ ${analysisResponse}
         const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
         updateContent('langsmith-logging', langsmithResponse);
         
-        // Step 10: User Response (deliver final formatted response)
-        if (shouldStop) throw new Error('Stopped by user');
-        console.log('🔄 Step 10: User Response');
-        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
-        updateContent('user-response', userResponseResponse);
-        
         console.log('✅ Complex Query Pipeline Complete!');
         
       } else {
@@ -316,13 +304,10 @@ ${analysisResponse}
         const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
         updateContent('langsmith-logging', langsmithResponse);
         
-        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
-        updateContent('user-response', userResponseResponse);
-        
         console.log('✅ Complex Query Pipeline Complete (fallback)!');
       }
       
-      // Keep user-response glowing with completion state, then show green glow
+      // Keep response-delivery glowing with completion state, then show green glow
       setTimeout(() => {
         setActiveProcessingNode(null);
         setShowFinalResponseGlow(true);
@@ -425,7 +410,7 @@ ${analysisResponse}
                   isLoading={loadingNodes.has(node.id)}
                   isActiveProcessing={currentProcessingNode === node.id}
                   isPipelineComplete={!isProcessing && generatedContent[node.id] && !showFinalResponseGlow}
-                  showReadyGlow={node.id === 'user-response' && showFinalResponseGlow}
+                  showReadyGlow={node.id === 'response-delivery' && showFinalResponseGlow}
                 />
               );
             }
