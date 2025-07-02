@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NodeData } from '../data/nodes';
 import styles from '../visualization.module.css';
 
@@ -16,6 +16,7 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Reset internal state when submittedPrompt is cleared (reset)
   useEffect(() => {
@@ -99,6 +100,17 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
       // Could add toast notification here in the future
     } finally {
       setIsOptimizing(false);
+      
+      // Restore focus to textarea after optimization completes
+      // Use a small delay to ensure the state updates are complete
+      setTimeout(() => {
+        if (textareaRef.current && !isProcessing) {
+          textareaRef.current.focus();
+          // Position cursor at the end of the text
+          const length = textareaRef.current.value.length;
+          textareaRef.current.setSelectionRange(length, length);
+        }
+      }, 50);
     }
   };
 
@@ -126,6 +138,7 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
       </div>
       <div className={styles.userPromptContainer}>
         <textarea
+          ref={textareaRef}
           id="user-prompt-input"
           name="userPrompt"
           className={`${styles.userPromptInput} ${isProcessing ? styles.userPromptDisabled : ''}`}

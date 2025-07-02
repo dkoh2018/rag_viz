@@ -178,20 +178,37 @@ const initializeLLM = () => {
   });
 };
 
-// Vector search (no changes needed)
+// Vector search with detailed logging and fallback
 const performVectorSearch = traceable(
   async (query: string, topK: number = 3): Promise<string> => {
-    // ... (function implementation is unchanged)
     try {
+      console.log(`🔍 [VECTOR] Searching for: "${query}"`);
       const vectorStorePath = path.join(process.cwd(), 'vectorstore', 'rag-store.index');
-      if (!fs.existsSync(vectorStorePath)) { return 'No document context available'; }
+      console.log(`📁 [VECTOR] Looking for vectorstore at: ${vectorStorePath}`);
+      
+      if (!fs.existsSync(vectorStorePath)) { 
+        console.warn(`⚠️ [VECTOR] Vectorstore not found at ${vectorStorePath}`);
+        return `[Vectorstore Not Available]
+Query: ${query}
+Status: Local knowledge base not found
+Location checked: ${vectorStorePath}
+
+This indicates the vectorstore hasn't been created yet. External research should be used instead.`;
+      }
+      
+      console.log(`✅ [VECTOR] Vectorstore found, loading...`);
       const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY });
       const vectorStore = await HNSWLib.load(vectorStorePath, embeddings);
       const retriever = vectorStore.asRetriever({ k: topK });
       const relevantDocs = await retriever.getRelevantDocuments(query);
+      
+      console.log(`📄 [VECTOR] Found ${relevantDocs.length} relevant documents`);
       const context = relevantDocs.map((doc, index) => `[Doc ${index + 1}]: ${doc.pageContent}`).join('\n\n');
-      return context || 'No relevant documents found';
-    } catch (error) { console.error('💥 [VECTOR] Vector search error:', error); return 'Vector search unavailable'; }
+      return context || 'No relevant documents found in vectorstore';
+    } catch (error) { 
+      console.error('💥 [VECTOR] Vector search error:', error); 
+      return `Vector search error: ${error instanceof Error ? error.message : String(error)}`;
+    }
   },
   { name: 'performVectorSearch', tags: ['vector-search', 'retrieval', 'langchain'] }
 );
@@ -215,17 +232,23 @@ export const processComplexRAGQuery = traceable(
       switch (agentId) {
         case 'worker-retrieval':
           console.log(`🔍 [${agentId}] Performing research for sub-query: "${userQuery}"`);
+          console.log(`🔬 [${agentId}] Research model: ${researchModel}`);
           let retrievedContext = '';
           if (researchModel === 'local') {
+            console.log(`💾 [${agentId}] Using local vector search...`);
             retrievedContext = await performVectorSearch(userQuery);
           } else {
+            console.log(`🌐 [${agentId}] Using external research with ${researchModel.toUpperCase()}...`);
             try {
               retrievedContext = await performResearch(userQuery, researchModel);
+              console.log(`✅ [${agentId}] External research completed, ${retrievedContext.length} characters`);
             } catch (error) {
               console.error(`❌ [${agentId}] External research failed, falling back to vector search:`, error);
               retrievedContext = await performVectorSearch(userQuery);
+              console.log(`🔄 [${agentId}] Fallback vector search completed, ${retrievedContext.length} characters`);
             }
           }
+          console.log(`📄 [${agentId}] Final retrieved context preview: ${retrievedContext.substring(0, 200)}...`);
           humanMessageContent = `<sub_query>${userQuery}</sub_query>\n\n<source_document>${retrievedContext}</source_document>`;
           break;
 
