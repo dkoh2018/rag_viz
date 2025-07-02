@@ -18,7 +18,7 @@ export const nodes: NodeData[] = [
   {
     id: 'router-agent',
     label: 'Router Agent',
-    content: 'Query Classification: Analyzed input complexity and determined this requires multi-step reasoning. Routing to orchestrator for comprehensive processing rather than direct retrieval.',
+    content: '',
     position: { left: '600px', top: '100px' }
   },
   {

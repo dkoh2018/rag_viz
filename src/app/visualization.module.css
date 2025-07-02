@@ -411,6 +411,7 @@
   font-weight: 400;
   line-height: 1.5;
   font-family: var(--font-inter), sans-serif;
+  position: relative;
 }
 
 /* Markdown Typography */
@@ -697,4 +698,107 @@
   50% {
     box-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 70px rgba(251, 191, 36, 0.5), 0 8px 25px -5px rgb(0 0 0 / 0.3);
   }
+}
+
+/* Router Agent Dual Badge Display */
+.routerOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.routerDualBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.routerBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgba(22, 27, 34, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  transition: all 0.4s ease;
+}
+
+.routerBadgeInitial {
+  opacity: 0.6;
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.routerBadgeActive {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.routerIcon {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.routerType {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.routerQueryTypeSimple {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.routerQueryTypeSimple.routerBadgeActive {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.routerQueryTypeSimple .routerIcon {
+  color: #22c55e;
+}
+
+.routerQueryTypeComplex {
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.routerQueryTypeComplex.routerBadgeActive {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.2);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.routerQueryTypeComplex .routerIcon {
+  color: #3b82f6;
+}
+
+/* Router Status Text */
+.routerStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.routerStatusText {
+  font-size: 0.9rem;
+  color: #8b949e;
+  text-align: center;
+  font-weight: 400;
+  line-height: 1.5;
+  opacity: 0.7;
 }
