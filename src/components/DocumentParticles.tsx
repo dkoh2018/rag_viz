@@ -10,7 +10,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const mousePositionRef = useRef({ x: 0, y: 0 })
   const isTouchingRef = useRef(false)
-  const animationFrameIdRef = useRef<number>()
+  const animationFrameIdRef = useRef<number | undefined>(undefined)
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
       return titleFontSize / 120
     }
 
-    function createParticle(scale: number) {
+    function createParticle() {
       if (!ctx || !canvas || !textImageData) return null
 
       const data = textImageData.data
@@ -86,14 +86,14 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
       return null
     }
 
-    function createInitialParticles(scale: number) {
+    function createInitialParticles() {
       for (let i = 0; i < particleCount; i++) {
-        const particle = createParticle(scale)
+        const particle = createParticle()
         if (particle) particles.push(particle)
       }
     }
 
-    function animate(scale: number) {
+    function animate() {
       if (!ctx || !canvas) return
       
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -126,7 +126,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
 
         p.life--
         if (p.life <= 0) {
-          const newParticle = createParticle(scale)
+          const newParticle = createParticle()
           if (newParticle) {
             particles[i] = newParticle
           } else {
@@ -138,24 +138,24 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
 
       // Maintain particle count
       while (particles.length < particleCount) {
-        const newParticle = createParticle(scale)
+        const newParticle = createParticle()
         if (newParticle) particles.push(newParticle)
       }
 
-      animationFrameIdRef.current = requestAnimationFrame(() => animate(scale))
+      animationFrameIdRef.current = requestAnimationFrame(animate)
     }
 
     // Initialize
     mousePositionRef.current = { x: canvas.width / 2, y: canvas.height / 2 }
-    const scale = createTextImage()
-    createInitialParticles(scale)
-    animate(scale)
+    createTextImage()
+    createInitialParticles()
+    animate()
 
     const handleResize = () => {
       updateCanvasSize()
-      const newScale = createTextImage()
+      createTextImage()
       particles = []
-      createInitialParticles(newScale)
+      createInitialParticles()
     }
 
     const handleMove = (x: number, y: number) => {
@@ -212,7 +212,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
     <canvas 
       ref={canvasRef} 
       className="w-full h-full"
-      aria-label="Interactive particle document with RAG Pipeline information"
+      aria-label="Interactive RAG Pipeline particle effect"
     />
   )
 }
