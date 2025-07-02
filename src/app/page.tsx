@@ -22,31 +22,30 @@ export default function HomePage() {
         />
       </div>
       
-      {/* Launch Button - Top Left */}
+      {/* Demo Button - Top Left */}
       <div className="absolute top-6 left-6 pointer-events-none">
         <Link 
           href="/rag-retrieval-visualization"
-          className="group relative inline-flex items-center gap-2 min-h-[48px] px-6 py-3 rounded-lg backdrop-blur-[20px] text-white font-medium text-sm tracking-wide transition-all duration-150 ease-out shadow-[0_4px_12px_rgba(0,0,0,0.45),0_1px_0_rgba(255,255,255,0.25)_inset] border border-white/18 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.6),0_1px_0_rgba(255,255,255,0.3)_inset] focus:outline-none focus:ring-2 focus:ring-blue-400/80 focus:ring-offset-2 focus:ring-offset-transparent active:translate-y-0 active:scale-[0.97] active:shadow-[0_2px_8px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.2)_inset] pointer-events-auto"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)'
-          }}
-          aria-label="Launch visualization"
+          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-black/40 border border-white/10 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-black/60 hover:border-white/20 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 active:scale-95 backdrop-blur-md pointer-events-auto"
+          aria-label="Try the demo"
         >
-          <span>Launch Visualization</span>
-          <svg 
-            className="w-4 h-4 opacity-80 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-1" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            aria-hidden="true"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              d="M13 7l5 5m0 0l-5 5m5-5H6" 
-            />
-          </svg>
+          <span>Try Demo</span>
+          <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center transition-all duration-200 group-hover:bg-white/30 group-hover:translate-x-0.5">
+            <svg 
+              className="w-2.5 h-2.5" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              strokeWidth={3}
+              aria-hidden="true"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                d="M9 5l7 7-7 7" 
+              />
+            </svg>
+          </div>
         </Link>
       </div>
       
