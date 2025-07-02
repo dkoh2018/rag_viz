@@ -284,7 +284,11 @@ export default function RAGVisualization() {
         
         {/* Research Model Toggle Button */}
         <button 
-          className={`${styles.statusButton} ${styles.researchModelButton}`}
+          className={`${styles.statusButton} ${styles.researchModelButton} ${
+            researchModel === 'exa' ? styles.researchModelExa :
+            researchModel === 'perplexity' ? styles.researchModelPerplexity :
+            styles.researchModelLocal
+          }`}
           onClick={handleResearchModelToggle}
           title={`Current: ${researchModel.toUpperCase()} - Click to cycle through research models`}
         >
