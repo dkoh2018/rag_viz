@@ -91,11 +91,11 @@ export const performExaSearch = async (query: string, numResults: number = 5): P
       const formattedResults = data.results.map((result, index) => {
         const publishedInfo = result.publishedDate ? ` (Published: ${new Date(result.publishedDate).toLocaleDateString()})` : '';
         const authorInfo = result.author ? ` by ${result.author}` : '';
+        const scoreInfo = result.score !== undefined ? ` (Score: ${result.score.toFixed(3)})` : '';
         
-        return `[Exa Result ${index + 1}] ${result.title}${authorInfo}${publishedInfo}
+        return `[Exa Result ${index + 1}] ${result.title}${authorInfo}${publishedInfo}${scoreInfo}
 URL: ${result.url}
-Content: ${result.text}
-Relevance Score: ${result.score.toFixed(3)}`;
+Content: ${result.text || 'No content available'}`;
       }).join('\n\n---\n\n');
 
       console.log(`✅ [EXA] Successfully retrieved ${data.results.length} results`);
