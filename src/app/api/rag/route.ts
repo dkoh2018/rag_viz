@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processRAGQuery } from '@/lib/rag-backend';
+import { processSimpleRAGQuery } from '@/lib/rag-backend-simple';
+import { processComplexRAGQuery } from '@/lib/rag-backend-complex';
 
 export async function POST(request: NextRequest) {
   console.log('🌐 [API] RAG API endpoint called');
@@ -22,8 +23,22 @@ export async function POST(request: NextRequest) {
     console.log(`📝 [API] Query: "${userQuery}"`);
     console.log(`🔬 [API] Research Model: ${researchModel.toUpperCase()}`);
 
-    // Process the query through the specified RAG agent
-    const response = await processRAGQuery(agentId, userQuery, context, researchModel);
+    // Define which agents use simple vs complex processing
+    const simpleAgents = ['router-agent', 'direct-generation', 'response-delivery', 'langsmith-logging', 'user-response'];
+    const complexAgents = ['orchestrator-agent', 'decompose-query', 'worker-retrieval', 'worker-research', 'worker-analysis', 'shared-state', 'synthesis-agent', 'evaluator-agent'];
+    
+    let response: string;
+    
+    if (simpleAgents.includes(agentId)) {
+      console.log(`🚀 [API] Using SIMPLE backend for ${agentId}`);
+      response = await processSimpleRAGQuery(agentId, userQuery, context);
+    } else if (complexAgents.includes(agentId)) {
+      console.log(`🚀 [API] Using COMPLEX backend for ${agentId}`);
+      response = await processComplexRAGQuery(agentId, userQuery, context, researchModel);
+    } else {
+      console.log(`⚠️ [API] Unknown agent ${agentId}, defaulting to complex backend`);
+      response = await processComplexRAGQuery(agentId, userQuery, context, researchModel);
+    }
     
     console.log(`✅ [API] Response from ${agentId}:`, response);
 

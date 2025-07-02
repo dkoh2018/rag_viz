@@ -46,6 +46,14 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Handle Cmd+E (Mac) or Ctrl+E (Windows/Linux) for optimize
+    if (e.key === 'e' && (e.metaKey || e.ctrlKey) && !isProcessing && !isOptimizing) {
+      e.preventDefault();
+      handleOptimize();
+      return;
+    }
+    
+    // Handle Enter for send
     if (e.key === 'Enter' && !e.shiftKey && !isProcessing && !isOptimizing) {
       e.preventDefault();
       handleSend();

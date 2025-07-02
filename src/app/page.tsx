@@ -95,11 +95,11 @@ export default function RAGVisualization() {
   };
 
   // Wrapper function to track loading state for individual nodes
-  const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal) => {
+  const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal, context: string = '') => {
     addLoadingNode(nodeId);
     setActiveProcessingNode(nodeId); // Mark as actively processing
     try {
-      const result = await generateResponse(nodeId, prompt, checkShouldStop, signal, researchModel);
+      const result = await generateResponse(nodeId, prompt, checkShouldStop, signal, researchModel, context);
       removeLoadingNode(nodeId);
       
       // Keep user-response node glowing until pipeline complete
@@ -149,79 +149,152 @@ export default function RAGVisualization() {
       const routerResponse = await generateResponseWithLoading('router-agent', prompt, checkShouldStop, controller.signal);
       updateContent('router-agent', routerResponse);
       
-      // Step 2a: Direct Generation (parallel path)
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 2a: Direct Generation (parallel)');
-      const directGenPromise = generateResponseWithLoading('direct-generation', prompt, checkShouldStop, controller.signal);
+      // Parse router decision
+      const isSimpleQuery = routerResponse.toLowerCase().includes('simple');
+      const isComplexQuery = routerResponse.toLowerCase().includes('complex');
       
-      // Step 2b: Orchestrator Agent  
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 2b: Orchestrator Agent');
-      const orchestratorResponse = await generateResponseWithLoading('orchestrator-agent', prompt, checkShouldStop, controller.signal);
-      updateContent('orchestrator-agent', orchestratorResponse);
+      console.log(`🧭 [ROUTER] Decision: ${isSimpleQuery ? 'SIMPLE' : isComplexQuery ? 'COMPLEX' : 'UNKNOWN'} query`);
       
-      // Step 3: Decompose Query
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 3: Decompose Query');
-      const decomposeResponse = await generateResponseWithLoading('decompose-query', prompt, checkShouldStop, controller.signal);
-      updateContent('decompose-query', decomposeResponse);
-      
-      // Step 4: Worker Threads (parallel execution)
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 4: Worker Threads (parallel)');
-      const [retrievalResponse, researchResponse, analysisResponse] = await Promise.all([
-        generateResponseWithLoading('worker-retrieval', prompt, checkShouldStop, controller.signal),
-        generateResponseWithLoading('worker-research', prompt, checkShouldStop, controller.signal),
-        generateResponseWithLoading('worker-analysis', prompt, checkShouldStop, controller.signal)
-      ]);
-      
-      updateContent('worker-retrieval', retrievalResponse);
-      updateContent('worker-research', researchResponse);
-      updateContent('worker-analysis', analysisResponse);
-      
-      // Step 5: Shared State
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 5: Shared State');
-      const sharedStateResponse = await generateResponseWithLoading('shared-state', prompt, checkShouldStop, controller.signal);
-      updateContent('shared-state', sharedStateResponse);
-      
-      // Step 6: Synthesis Agent
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 6: Synthesis Agent');
-      const synthesisResponse = await generateResponseWithLoading('synthesis-agent', prompt, checkShouldStop, controller.signal);
-      updateContent('synthesis-agent', synthesisResponse);
-      
-      // Step 7: Evaluator Agent
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 7: Evaluator Agent');
-      const evaluatorResponse = await generateResponseWithLoading('evaluator-agent', prompt, checkShouldStop, controller.signal);
-      updateContent('evaluator-agent', evaluatorResponse);
-      
-      // Wait for Direct Generation to complete if not already done
-      if (!shouldStop) {
-        const directResponse = await directGenPromise;
+      if (isSimpleQuery) {
+        // SIMPLE QUERY PATH: Router → Direct Generation → Response Delivery → Logging → User Response
+        console.log('🚀 [SIMPLE PATH] Executing simple query pipeline');
+        
+        // Step 2: Direct Generation
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 2: Direct Generation');
+        const directResponse = await generateResponseWithLoading('direct-generation', prompt, checkShouldStop, controller.signal);
         updateContent('direct-generation', directResponse);
+        
+        // Step 3: Response Delivery
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 3: Response Delivery');
+        const responseDeliveryResponse = await generateResponseWithLoading('response-delivery', directResponse, checkShouldStop, controller.signal);
+        updateContent('response-delivery', responseDeliveryResponse);
+        
+        // Step 4: LangSmith Logging
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 4: LangSmith Logging');
+        const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
+        updateContent('langsmith-logging', langsmithResponse);
+        
+        // Step 5: User Response
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 5: User Response');
+        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal, responseDeliveryResponse);
+        updateContent('user-response', userResponseResponse);
+        
+        console.log('✅ Simple Query Pipeline Complete!');
+        
+      } else if (isComplexQuery) {
+        // COMPLEX QUERY PATH: Router → Orchestrator → Full multi-agent pipeline
+        console.log('🚀 [COMPLEX PATH] Executing complex query pipeline');
+        
+        // Step 2: Orchestrator Agent  
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 2: Orchestrator Agent');
+        const orchestratorResponse = await generateResponseWithLoading('orchestrator-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('orchestrator-agent', orchestratorResponse);
+        
+        // Step 3: Decompose Query
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 3: Decompose Query');
+        const decomposeResponse = await generateResponseWithLoading('decompose-query', prompt, checkShouldStop, controller.signal);
+        updateContent('decompose-query', decomposeResponse);
+        
+        // Step 4: Worker Threads (parallel execution)
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 4: Worker Threads (parallel)');
+        const [retrievalResponse, researchResponse, analysisResponse] = await Promise.all([
+          generateResponseWithLoading('worker-retrieval', prompt, checkShouldStop, controller.signal),
+          generateResponseWithLoading('worker-research', prompt, checkShouldStop, controller.signal),
+          generateResponseWithLoading('worker-analysis', prompt, checkShouldStop, controller.signal)
+        ]);
+        
+        updateContent('worker-retrieval', retrievalResponse);
+        updateContent('worker-research', researchResponse);
+        updateContent('worker-analysis', analysisResponse);
+        
+        // Step 5: Shared State
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 5: Shared State');
+        const sharedStateResponse = await generateResponseWithLoading('shared-state', prompt, checkShouldStop, controller.signal);
+        updateContent('shared-state', sharedStateResponse);
+        
+        // Step 6: Synthesis Agent
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 6: Synthesis Agent');
+        const synthesisResponse = await generateResponseWithLoading('synthesis-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('synthesis-agent', synthesisResponse);
+        
+        // Step 7: Evaluator Agent
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 7: Evaluator Agent');
+        const evaluatorResponse = await generateResponseWithLoading('evaluator-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('evaluator-agent', evaluatorResponse);
+        
+        // Step 8: Response Delivery
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 8: Response Delivery');
+        const responseDeliveryResponse = await generateResponseWithLoading('response-delivery', prompt, checkShouldStop, controller.signal);
+        updateContent('response-delivery', responseDeliveryResponse);
+        
+        // Step 9: LangSmith Logging
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 9: LangSmith Logging');
+        const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
+        updateContent('langsmith-logging', langsmithResponse);
+        
+        // Step 10: User Response
+        if (shouldStop) throw new Error('Stopped by user');
+        console.log('🔄 Step 10: User Response');
+        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal);
+        updateContent('user-response', userResponseResponse);
+        
+        console.log('✅ Complex Query Pipeline Complete!');
+        
+      } else {
+        // Fallback: treat as complex if router decision is unclear
+        console.log('⚠️ [ROUTER] Unclear decision, defaulting to complex path');
+        console.log('🚀 [COMPLEX PATH] Executing complex query pipeline (fallback)');
+        
+        // Execute complex path as fallback...
+        // (Same complex path code as above, but I'll keep it brief to avoid duplication)
+        const orchestratorResponse = await generateResponseWithLoading('orchestrator-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('orchestrator-agent', orchestratorResponse);
+        
+        const decomposeResponse = await generateResponseWithLoading('decompose-query', prompt, checkShouldStop, controller.signal);
+        updateContent('decompose-query', decomposeResponse);
+        
+        const [retrievalResponse, researchResponse, analysisResponse] = await Promise.all([
+          generateResponseWithLoading('worker-retrieval', prompt, checkShouldStop, controller.signal),
+          generateResponseWithLoading('worker-research', prompt, checkShouldStop, controller.signal),
+          generateResponseWithLoading('worker-analysis', prompt, checkShouldStop, controller.signal)
+        ]);
+        
+        updateContent('worker-retrieval', retrievalResponse);
+        updateContent('worker-research', researchResponse);
+        updateContent('worker-analysis', analysisResponse);
+        
+        const sharedStateResponse = await generateResponseWithLoading('shared-state', prompt, checkShouldStop, controller.signal);
+        updateContent('shared-state', sharedStateResponse);
+        
+        const synthesisResponse = await generateResponseWithLoading('synthesis-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('synthesis-agent', synthesisResponse);
+        
+        const evaluatorResponse = await generateResponseWithLoading('evaluator-agent', prompt, checkShouldStop, controller.signal);
+        updateContent('evaluator-agent', evaluatorResponse);
+        
+        const responseDeliveryResponse = await generateResponseWithLoading('response-delivery', prompt, checkShouldStop, controller.signal);
+        updateContent('response-delivery', responseDeliveryResponse);
+        
+        const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
+        updateContent('langsmith-logging', langsmithResponse);
+        
+        const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal);
+        updateContent('user-response', userResponseResponse);
+        
+        console.log('✅ Complex Query Pipeline Complete (fallback)!');
       }
-      
-      // Step 8: Response Delivery (combines evaluator and direct generation)
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 8: Response Delivery');
-      const responseDeliveryResponse = await generateResponseWithLoading('response-delivery', prompt, checkShouldStop, controller.signal);
-      updateContent('response-delivery', responseDeliveryResponse);
-      
-      // Step 9: LangSmith Logging
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 9: LangSmith Logging');
-      const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
-      updateContent('langsmith-logging', langsmithResponse);
-      
-      // Step 10: User Response
-      if (shouldStop) throw new Error('Stopped by user');
-      console.log('🔄 Step 10: User Response');
-      const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal);
-      updateContent('user-response', userResponseResponse);
-      
-      console.log('✅ RAG Pipeline Complete!');
       
       // Keep user-response glowing with completion state, then clear
       setTimeout(() => {
