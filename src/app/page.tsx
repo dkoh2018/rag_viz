@@ -52,12 +52,13 @@ export default function HomePage() {
       ctx.save()
       
       const fontSize = isMobile ? 60 : RAG_TEXT_CONFIG.fontSize
-      ctx.font = `${RAG_TEXT_CONFIG.fontWeight} ${fontSize}px ${RAG_TEXT_CONFIG.fontFamily}`
+      // Use a web-safe font as fallback
+      ctx.font = `${RAG_TEXT_CONFIG.fontWeight} ${fontSize}px Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       
       const x = canvas.width / 2
-      const y = canvas.height / 2 - 40 // Slightly above center
+      const y = canvas.height / 2 - 40
       
       ctx.fillText(RAG_TEXT_CONFIG.text, x, y)
       ctx.restore()
@@ -95,7 +96,7 @@ export default function HomePage() {
     }
 
     function createInitialParticles(scale: number) {
-      const baseParticleCount = 6000
+      const baseParticleCount = 2000 // Reduced from 6000
       const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       for (let i = 0; i < particleCount; i++) {
         const particle = createParticle(scale)
@@ -150,7 +151,7 @@ export default function HomePage() {
         }
       }
 
-      const baseParticleCount = 6000
+      const baseParticleCount = 2000 // Reduced from 6000
       const targetParticleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (1920 * 1080)))
       while (particles.length < targetParticleCount) {
         const newParticle = createParticle(scale)
@@ -160,6 +161,9 @@ export default function HomePage() {
       animationFrameId = requestAnimationFrame(() => animate(scale))
     }
 
+    // Initialize mouse position to center
+    mousePositionRef.current = { x: canvas.width / 2, y: canvas.height / 2 }
+    
     const scale = createTextImage()
     createInitialParticles(scale)
     animate(scale)
@@ -173,6 +177,8 @@ export default function HomePage() {
 
     const handleMove = (x: number, y: number) => {
       mousePositionRef.current = { x, y }
+      // Debugging - remove this after testing
+      console.log('Mouse position:', x, y)
     }
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -223,12 +229,12 @@ export default function HomePage() {
     <div className="relative w-full h-dvh overflow-hidden bg-gradient-to-br from-[#1a1d23] via-[#21262d] to-[#1a1d23]">
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full touch-none z-0"
+        className="absolute inset-0 w-full h-full touch-none z-10"
         aria-label="Interactive particle effect with RAG Pipeline text"
       />
       
       {/* Content positioned below particles */}
-      <div className="absolute inset-0 flex flex-col items-center justify-end pb-32 px-6 z-20">
+      <div className="absolute inset-0 flex flex-col items-center justify-end pb-32 px-6 z-0 pointer-events-none">
         <div className="text-center space-y-8">
           <p className="text-xl md:text-2xl text-white/90 leading-tight font-medium tracking-wide">
             Interactive visualization of multi-agent RAG systems
@@ -236,7 +242,7 @@ export default function HomePage() {
 
           <Link 
             href="/rag-retrieval-visualization"
-            className="group inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-white/8 border border-white/15 backdrop-blur-xl text-white font-medium text-lg transition-all duration-300 hover:bg-white/12 hover:border-white/25 hover:shadow-2xl hover:shadow-blue-500/20 active:scale-[0.98] hover:scale-[1.02]"
+            className="group inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-white/8 border border-white/15 backdrop-blur-xl text-white font-medium text-lg transition-all duration-300 hover:bg-white/12 hover:border-white/25 hover:shadow-2xl hover:shadow-blue-500/20 active:scale-[0.98] hover:scale-[1.02] pointer-events-auto"
           >
             <span className="tracking-wide">Launch Visualization</span>
             <svg 
