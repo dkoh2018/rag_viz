@@ -2,9 +2,7 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: #0d1117;
-  background-image: radial-gradient(#21262d 1px, transparent 1px);
-  background-size: 16px 16px;
+  background: linear-gradient(135deg, #1a1d23 0%, #21262d 50%, #1a1d23 100%);
   font-family: var(--font-inter), sans-serif;
 }
 
@@ -14,11 +12,41 @@
   overflow: auto;
 }
 
+/* Custom scrollbar styles */
+.scrollWrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollWrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.scrollWrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scrollWrapper::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox scrollbar */
+.scrollWrapper {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
 .diagramContainer {
   position: relative;
   width: 7000px;
   height: 2000px;
-  margin: 4rem;
+  margin: 0.5rem 4rem 4rem 4rem;
 }
 
 .connectorSvg {
@@ -73,4 +101,72 @@
   font-weight: 500;
   text-anchor: middle;
   font-family: var(--font-inter), sans-serif;
+}
+
+/* User Prompt Input Styles */
+.userPromptContainer {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 2.5rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.userPromptInput {
+  width: 100%;
+  height: calc(100% - 50px);
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  font-family: var(--font-inter), sans-serif;
+  resize: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+.userPromptInput::placeholder {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.userPromptInput:focus {
+  outline: none;
+}
+
+.sendButton {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: #374151;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  opacity: 0.3;
+}
+
+.sendButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.sendButtonActive {
+  background-color: #c9d1d9;
+  color: #161b22;
+  opacity: 1;
+}
+
+.sendButtonActive:hover {
+  background-color: #f0f6fc;
+  transform: scale(1.05);
 }
