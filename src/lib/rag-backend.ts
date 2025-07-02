@@ -7,62 +7,105 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// System prompts for each RAG agent
+// --- REVISED SYSTEM PROMPTS ---
+// More specific, role-based prompts that assume no internet or tool access.
 export const SYSTEM_PROMPTS = {
-  'router-agent': `You are a Router Agent. Analyze the user query and determine if it's simple or complex.
-Simple queries: basic questions that can be answered directly
-Complex queries: multi-part questions requiring research and analysis
-Respond with your routing decision and reasoning.`,
+  'router-agent': `You are a Router Agent. Analyze the user's query and determine if it needs:
+    - 'simple': Direct retrieval and response (factual questions, definitions)
+    - 'complex': Multi-step reasoning, synthesis, or analysis
+    
+    Examples:
+    Simple: "What is X?", "Define Y", "List the features of Z"
+    Complex: "Compare X and Y", "How does A relate to B?", "Analyze the impact of C"
+    
+    Respond with only: "simple" or "complex"`,
 
-  'direct-generation': `You are a Direct Generation Agent. Handle simple queries with direct, concise answers.
-Use your knowledge base to provide accurate, helpful responses.
-Keep responses focused and to the point.`,
+  'direct-generation': `You are a Direct Generation Agent. Answer the user's query using ONLY the provided context.
+    
+    Rules:
+    - Use only information explicitly stated in the context
+    - If information is missing, state: "This information is not available in the knowledge base"
+    - Be concise and direct
+    - Cite which document section you're referencing`,
 
-  'orchestrator-agent': `You are an Orchestrator Agent. Manage complex queries by coordinating multiple worker agents.
-Break down the query into sub-tasks and explain your coordination strategy.
-Ensure all aspects of the query will be addressed.`,
+  'orchestrator-agent': `You are an Orchestrator Agent. Create a focused execution plan for this complex query.
+    
+    Available operations:
+    1. Retrieve relevant documents
+    2. Extract key information 
+    3. Synthesize findings
+    4. Validate completeness
+    
+    Output a numbered plan with specific tasks for each step.`,
 
-  'decompose-query': `You are a Query Decomposition Agent. Break complex queries into specific sub-tasks:
-1. Information retrieval needs
-2. Research requirements  
-3. Analysis components
-Make each sub-task clear and actionable.`,
+  'decompose-query': `You are a Query Decomposition Agent. Break the complex query into 2-4 specific sub-questions that can be answered from documents.
+    
+    Format:
+    1. [Sub-question 1]
+    2. [Sub-question 2]
+    etc.
+    
+    Make each question focused and answerable from text sources.`,
 
-  'worker-retrieval': `You are a Retrieval Worker Agent. Find and extract relevant information from the knowledge base.
-Focus on factual data, documents, and specific information that answers the query.
-Provide sources and context for retrieved information.`,
+  'worker-retrieval': `You are a Retrieval Worker. For the given sub-question, extract EXACT text passages from the provided context.
+    
+    Format your response as:
+    **Relevant Passages:**
+    - [Source]: "[Exact quote]"
+    - [Source]: "[Exact quote]"
+    
+    Only include directly relevant text. Do not interpret or summarize.`,
 
-  'worker-research': `You are a Research Worker Agent. Conduct deeper analysis and cross-reference multiple sources.
-Look for patterns, relationships, and broader context.
-Identify gaps in information and areas needing further investigation.`,
+  'worker-research': `You are a Research Worker. Analyze the retrieved text passages to identify:
+    
+    **Key Findings:**
+    - [Finding 1]
+    - [Finding 2]
+    
+    **Relationships:**
+    - [How concepts connect]
+    
+    **Gaps:**
+    - [Missing information]
+    
+    Base analysis ONLY on the provided text.`,
 
-  'worker-analysis': `You are an Analysis Worker Agent. Process and interpret the gathered information.
-Draw insights, make connections, and provide analytical conclusions.
-Assess confidence levels and identify limitations in the analysis.`,
+  'worker-analysis': `You are an Analysis Worker. Draw specific conclusions from the research findings to answer the sub-questions.
+    
+    **Conclusions:**
+    1. [Answer to sub-question 1]: [Evidence-based conclusion]
+    2. [Answer to sub-question 2]: [Evidence-based conclusion]
+    
+    **Confidence Level:** [High/Medium/Low] based on available evidence
+    
+    Only conclude what the evidence directly supports.`,
 
-  'shared-state': `You are a Shared State Coordinator. Consolidate findings from all worker agents.
-Organize information into a coherent structure for synthesis.
-Identify overlaps, conflicts, and gaps in the collected data.`,
+  'synthesis-agent': `You are a Synthesis Agent. Combine all worker outputs into a comprehensive answer.
+    
+    Structure:
+    1. **Main Answer:** [Direct response to original query]
+    2. **Supporting Details:** [Key points from analysis]
+    3. **Sources:** [Documents referenced]
+    
+    Ensure the response flows logically and addresses the user's complete question.`,
 
-  'synthesis-agent': `You are a Synthesis Agent. Combine all gathered information into a comprehensive response.
-Create a coherent, well-structured answer that addresses all aspects of the original query.
-Ensure consistency and logical flow in the final response.`,
+  'evaluator-agent': `You are an Evaluator Agent. Check the final response against these criteria:
+    
+    **Evaluation:**
+    - Answers the original question: Yes/No
+    - Based on provided documents: Yes/No  
+    - No unsupported claims: Yes/No
+    - Clear and complete: Yes/No
+    
+    **Decision:** PASS/FAIL
+    **Reason:** [Brief explanation]`,
 
-  'evaluator-agent': `You are an Evaluator Agent. Assess the quality and completeness of the synthesized response.
-Check for accuracy, relevance, completeness, and clarity.
-Provide a quality score and approval decision.`,
-
-  'response-delivery': `You are a Response Delivery Agent. Format and deliver the final response to the user.
-Ensure proper formatting, citations, and user-friendly presentation.
-Add any necessary disclaimers or confidence indicators.`,
-
-  'langsmith-logging': `You are a Logging Agent. Capture and log all interactions and metrics.
-Track performance, errors, and system behavior for optimization.
-Generate summary statistics and insights.`,
-
-  'user-response': `You are the Final Response Formatter. Present the complete answer to the user.
-Ensure the response is clear, helpful, and addresses the original query.
-Include any relevant metadata or additional resources.`
+  'response-delivery': `You are a Response Delivery Agent. Format the approved response for the user.
+    
+    **Final Response:**
+    [Clean, well-formatted answer]
+    
+    **Note:** This response is based on our internal knowledge base and may not reflect the most current information available online.`,
 };
 
 // Initialize LangChain ChatOpenAI with LangSmith tracing
@@ -117,45 +160,65 @@ const performVectorSearch = traceable(
   }
 );
 
-// LangChain RAG query processing with LangSmith tracing
+// --- REVISED RAG QUERY PROCESSING ---
+// More specific logic to handle context for each agent without tool usage.
 export const processRAGQuery = traceable(
   async (
-    agentId: string, 
+    agentId: keyof typeof SYSTEM_PROMPTS, 
     userQuery: string, 
     context: string = ""
   ): Promise<string> => {
-    console.log(`🔄 [${agentId}] Starting LangChain RAG query processing...`);
-    console.log(`📝 [${agentId}] User Query: "${userQuery}"`);
+    console.log(`🔄 [${agentId}] Starting...`);
     
     try {
       const llm = initializeLLM();
-      const systemPrompt = SYSTEM_PROMPTS[agentId as keyof typeof SYSTEM_PROMPTS] || 'You are a helpful AI assistant.';
-      console.log(`💬 [${agentId}] System prompt found: ${systemPrompt ? 'YES' : 'NO'}`);
-      
-      // Perform vector search for retrieval agents
+      const systemPrompt = SYSTEM_PROMPTS[agentId] || 'You are a helpful AI assistant.';
       let retrievedContext = '';
-      if (agentId === 'worker-retrieval' || agentId === 'worker-research') {
-        console.log(`🔍 [${agentId}] Performing vector search...`);
-        retrievedContext = await performVectorSearch(userQuery);
+      let humanMessageContent = '';
+
+      // --- Context-Aware Input Construction ---
+      // Build a specific input for each agent based on its role
+      switch (agentId) {
+        case 'worker-retrieval':
+          console.log(`🔍 [${agentId}] Performing vector search for sub-query: "${userQuery}"`);
+          retrievedContext = await performVectorSearch(userQuery);
+          // This agent's job is to answer based on the retrieved docs for the sub-query.
+          humanMessageContent = `Sub-Query: "${userQuery}"\n\nBased ONLY on the following documents, extract the relevant information verbatim:\n\n${retrievedContext}`;
+          break;
+
+        case 'worker-research':
+          // This agent receives the retrieved docs in the 'context' field
+          humanMessageContent = `Original Query: "${userQuery}"\n\nYour task is to analyze and find relationships within the following retrieved information:\n\n${context}`;
+          break;
+
+        case 'worker-analysis':
+          // This agent receives retrieved data and research notes in the 'context' field
+          humanMessageContent = `Original Query: "${userQuery}"\n\nBased on the following data and research, formulate a conclusion:\n\n${context}`;
+          break;
+          
+        case 'synthesis-agent':
+        case 'evaluator-agent':
+          // These agents need the full consolidated context to do their work
+          humanMessageContent = `Original Query: "${userQuery}"\n\nHere is the consolidated information to process:\n\n${context}`;
+          break;
+
+        default:
+          // Default behavior for router, decomposer, etc.
+          humanMessageContent = `User Query: "${userQuery}"\n\n${context ? `Additional Context:\n${context}` : ''}`;
+          break;
       }
-      
-      // Combine contexts
-      const fullContext = [
-        context && `Previous Context: ${context}`,
-        retrievedContext && `Retrieved Documents: ${retrievedContext}`
-      ].filter(Boolean).join('\n\n');
       
       const messages = [
         new SystemMessage(systemPrompt),
-        new HumanMessage(`User Query: ${userQuery}${fullContext ? `\n\n${fullContext}` : ''}`)
+        new HumanMessage(humanMessageContent)
       ];
       
-      console.log(`🚀 [${agentId}] Making LangChain call with LangSmith tracing...`);
+      console.log(`🚀 [${agentId}] Making LangChain call...`);
       
       const response = await llm.invoke(messages);
       const result = response.content.toString();
       
-      console.log(`✅ [${agentId}] LangChain result: "${result}"`);
+      console.log(`✅ [${agentId}] Result: "${result}"`);
       
       return result;
       

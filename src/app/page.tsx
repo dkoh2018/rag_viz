@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './visualization.module.css';
 import { nodes } from './data/nodes';
-import Node from './components/Node';
 import UserPrompt from './components/UserPrompt';
 import GenerativeNode from './components/GenerativeNode';
 import Connectors from './components/Connectors';
@@ -15,6 +14,27 @@ export default function RAGVisualization() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [shouldStop, setShouldStop] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+
+  // Helper functions for loading state management
+  const addLoadingNode = (nodeId: string) => {
+    setLoadingNodes(prev => new Set([...prev, nodeId]));
+    console.log(`⏳ [LOADING] ${nodeId} started loading`);
+  };
+
+  const removeLoadingNode = (nodeId: string) => {
+    setLoadingNodes(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(nodeId);
+      return newSet;
+    });
+    console.log(`✅ [LOADING] ${nodeId} finished loading`);
+  };
+
+  const clearAllLoadingNodes = () => {
+    setLoadingNodes(new Set());
+    console.log(`🧹 [LOADING] All loading states cleared`);
+  };
 
   const handleStop = () => {
     setShouldStop(true);
@@ -41,8 +61,25 @@ export default function RAGVisualization() {
     setIsProcessing(false);
     setShouldStop(false);
     setAbortController(null);
+    clearAllLoadingNodes();
     
-    console.log('🔄 Website reset by user');
+    console.log('🔄 Website reset by user - reloading page');
+    
+    // Reload the entire page (like Ctrl+R)
+    window.location.reload();
+  };
+
+  // Wrapper function to track loading state for individual nodes
+  const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal) => {
+    addLoadingNode(nodeId);
+    try {
+      const result = await generateResponse(nodeId, prompt, checkShouldStop, signal);
+      removeLoadingNode(nodeId);
+      return result;
+    } catch (error) {
+      removeLoadingNode(nodeId);
+      throw error;
+    }
   };
 
   const handlePromptSubmit = async (prompt: string) => {
@@ -75,33 +112,33 @@ export default function RAGVisualization() {
       // Step 1: Router Agent
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 1: Router Agent');
-      const routerResponse = await generateResponse('router-agent', prompt, checkShouldStop, controller.signal);
+      const routerResponse = await generateResponseWithLoading('router-agent', prompt, checkShouldStop, controller.signal);
       updateContent('router-agent', routerResponse);
       
       // Step 2a: Direct Generation (parallel path)
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 2a: Direct Generation (parallel)');
-      const directGenPromise = generateResponse('direct-generation', prompt, checkShouldStop, controller.signal);
+      const directGenPromise = generateResponseWithLoading('direct-generation', prompt, checkShouldStop, controller.signal);
       
       // Step 2b: Orchestrator Agent  
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 2b: Orchestrator Agent');
-      const orchestratorResponse = await generateResponse('orchestrator-agent', prompt, checkShouldStop, controller.signal);
+      const orchestratorResponse = await generateResponseWithLoading('orchestrator-agent', prompt, checkShouldStop, controller.signal);
       updateContent('orchestrator-agent', orchestratorResponse);
       
       // Step 3: Decompose Query
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 3: Decompose Query');
-      const decomposeResponse = await generateResponse('decompose-query', prompt, checkShouldStop, controller.signal);
+      const decomposeResponse = await generateResponseWithLoading('decompose-query', prompt, checkShouldStop, controller.signal);
       updateContent('decompose-query', decomposeResponse);
       
       // Step 4: Worker Threads (parallel execution)
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 4: Worker Threads (parallel)');
       const [retrievalResponse, researchResponse, analysisResponse] = await Promise.all([
-        generateResponse('worker-retrieval', prompt, checkShouldStop, controller.signal),
-        generateResponse('worker-research', prompt, checkShouldStop, controller.signal),
-        generateResponse('worker-analysis', prompt, checkShouldStop, controller.signal)
+        generateResponseWithLoading('worker-retrieval', prompt, checkShouldStop, controller.signal),
+        generateResponseWithLoading('worker-research', prompt, checkShouldStop, controller.signal),
+        generateResponseWithLoading('worker-analysis', prompt, checkShouldStop, controller.signal)
       ]);
       
       updateContent('worker-retrieval', retrievalResponse);
@@ -111,19 +148,19 @@ export default function RAGVisualization() {
       // Step 5: Shared State
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 5: Shared State');
-      const sharedStateResponse = await generateResponse('shared-state', prompt, checkShouldStop, controller.signal);
+      const sharedStateResponse = await generateResponseWithLoading('shared-state', prompt, checkShouldStop, controller.signal);
       updateContent('shared-state', sharedStateResponse);
       
       // Step 6: Synthesis Agent
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 6: Synthesis Agent');
-      const synthesisResponse = await generateResponse('synthesis-agent', prompt, checkShouldStop, controller.signal);
+      const synthesisResponse = await generateResponseWithLoading('synthesis-agent', prompt, checkShouldStop, controller.signal);
       updateContent('synthesis-agent', synthesisResponse);
       
       // Step 7: Evaluator Agent
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 7: Evaluator Agent');
-      const evaluatorResponse = await generateResponse('evaluator-agent', prompt, checkShouldStop, controller.signal);
+      const evaluatorResponse = await generateResponseWithLoading('evaluator-agent', prompt, checkShouldStop, controller.signal);
       updateContent('evaluator-agent', evaluatorResponse);
       
       // Wait for Direct Generation to complete if not already done
@@ -135,19 +172,19 @@ export default function RAGVisualization() {
       // Step 8: Response Delivery (combines evaluator and direct generation)
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 8: Response Delivery');
-      const responseDeliveryResponse = await generateResponse('response-delivery', prompt, checkShouldStop, controller.signal);
+      const responseDeliveryResponse = await generateResponseWithLoading('response-delivery', prompt, checkShouldStop, controller.signal);
       updateContent('response-delivery', responseDeliveryResponse);
       
       // Step 9: LangSmith Logging
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 9: LangSmith Logging');
-      const langsmithResponse = await generateResponse('langsmith-logging', prompt, checkShouldStop, controller.signal);
+      const langsmithResponse = await generateResponseWithLoading('langsmith-logging', prompt, checkShouldStop, controller.signal);
       updateContent('langsmith-logging', langsmithResponse);
       
       // Step 10: User Response
       if (shouldStop) throw new Error('Stopped by user');
       console.log('🔄 Step 10: User Response');
-      const userResponseResponse = await generateResponse('user-response', prompt, checkShouldStop, controller.signal);
+      const userResponseResponse = await generateResponseWithLoading('user-response', prompt, checkShouldStop, controller.signal);
       updateContent('user-response', userResponseResponse);
       
       console.log('✅ RAG Pipeline Complete!');
@@ -164,6 +201,7 @@ export default function RAGVisualization() {
       setIsProcessing(false);
       setShouldStop(false);
       setAbortController(null);
+      clearAllLoadingNodes();
     }
   };
 
@@ -225,6 +263,7 @@ export default function RAGVisualization() {
                   key={node.id} 
                   node={node} 
                   generatedContent={generatedContent[node.id]}
+                  isLoading={loadingNodes.has(node.id)}
                 />
               );
             }

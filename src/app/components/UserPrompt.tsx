@@ -68,8 +68,8 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
           value={displayPrompt}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder={isProcessing ? "Processing your query..." : "Enter your query to start the RAG process..."}
-          rows={4}
+          placeholder={isProcessing ? "Processing your query..." : "What is machine learning and how does it work?"}
+          rows={3}
           disabled={isInputDisabled}
         />
         <button
