@@ -16,7 +16,6 @@ export default function RAGVisualization() {
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
   const [currentProcessingNode, setCurrentProcessingNode] = useState<string | null>(null);
-  const [pipelineComplete, setPipelineComplete] = useState(false);
   const [researchModel, setResearchModel] = useState<'exa' | 'perplexity' | 'local'>('exa');
 
   // Helper functions for loading state management
@@ -37,7 +36,6 @@ export default function RAGVisualization() {
   const clearAllLoadingNodes = () => {
     setLoadingNodes(new Set());
     setCurrentProcessingNode(null);
-    setPipelineComplete(false);
     console.log(`🧹 [LOADING] All loading states cleared`);
   };
 
@@ -224,7 +222,6 @@ export default function RAGVisualization() {
       updateContent('user-response', userResponseResponse);
       
       console.log('✅ RAG Pipeline Complete!');
-      setPipelineComplete(true);
       
       // Keep user-response glowing with completion state, then clear
       setTimeout(() => {

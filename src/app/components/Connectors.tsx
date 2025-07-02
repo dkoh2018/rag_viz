@@ -20,7 +20,7 @@ export default function Connectors() {
       {/* Connector paths */}
       <path d="M 480 250 L 590 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <path d="M 1000 250 C 2000 200, 3000 200, 4130 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="2565" y="200" className={styles.connectorLabel}>Simple Query</text>
+      <text x="1265" y="220" className={styles.connectorLabel}>Simple Query</text>
       <path d="M 825 450 L 825 470 L 1200 470 L 1230 470" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <text x="1025" y="490" className={styles.connectorLabel}>Complex Query</text>
       <path d="M 1730 470 L 1870 470 L 1870 685" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
@@ -38,8 +38,8 @@ export default function Connectors() {
       <path d="M 5210 250 L 5340 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <path d="M 5810 250 L 5940 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <path d="M 4380 1050 L 4380 1500 L 1475 1500 L 1475 665" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="4280" y="1100" className={styles.connectorLabel}>Needs Refinement</text>
-      <text x="1350" y="720" className={styles.connectorLabel}>Needs Refinement</text>
+      <text x="4280" y="1250" className={styles.connectorLabel}>Needs Refinement</text>
+      <text x="1360" y="875" className={styles.connectorLabel}>Needs Refinement</text>
     </svg>
   );
 }
