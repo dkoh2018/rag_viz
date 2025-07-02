@@ -15,6 +15,9 @@ export default function RAGVisualization() {
   const [shouldStop, setShouldStop] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
+  const [currentProcessingNode, setCurrentProcessingNode] = useState<string | null>(null);
+  const [pipelineComplete, setPipelineComplete] = useState(false);
+  const [researchModel, setResearchModel] = useState<'exa' | 'perplexity' | 'local'>('exa');
 
   // Helper functions for loading state management
   const addLoadingNode = (nodeId: string) => {
@@ -33,7 +36,31 @@ export default function RAGVisualization() {
 
   const clearAllLoadingNodes = () => {
     setLoadingNodes(new Set());
+    setCurrentProcessingNode(null);
+    setPipelineComplete(false);
     console.log(`🧹 [LOADING] All loading states cleared`);
+  };
+
+  const setActiveProcessingNode = (nodeId: string | null) => {
+    setCurrentProcessingNode(nodeId);
+    if (nodeId) {
+      console.log(`🔥 [ACTIVE] ${nodeId} is now actively processing`);
+    } else {
+      console.log(`🔥 [ACTIVE] No node actively processing`);
+    }
+  };
+
+  const handleResearchModelToggle = () => {
+    let newModel: 'exa' | 'perplexity' | 'local';
+    if (researchModel === 'exa') {
+      newModel = 'perplexity';
+    } else if (researchModel === 'perplexity') {
+      newModel = 'local';
+    } else {
+      newModel = 'exa';
+    }
+    setResearchModel(newModel);
+    console.log(`🔄 [RESEARCH] Switched to ${newModel.toUpperCase()} for retrieval`);
   };
 
   const handleStop = () => {
@@ -72,12 +99,21 @@ export default function RAGVisualization() {
   // Wrapper function to track loading state for individual nodes
   const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal) => {
     addLoadingNode(nodeId);
+    setActiveProcessingNode(nodeId); // Mark as actively processing
     try {
-      const result = await generateResponse(nodeId, prompt, checkShouldStop, signal);
+      const result = await generateResponse(nodeId, prompt, checkShouldStop, signal, researchModel);
       removeLoadingNode(nodeId);
+      
+      // Keep user-response node glowing until pipeline complete
+      if (nodeId !== 'user-response') {
+        setActiveProcessingNode(null); // Clear active processing for other nodes
+      }
+      // user-response stays active until pipeline completion
+      
       return result;
     } catch (error) {
       removeLoadingNode(nodeId);
+      setActiveProcessingNode(null); // Clear active processing on error
       throw error;
     }
   };
@@ -188,6 +224,13 @@ export default function RAGVisualization() {
       updateContent('user-response', userResponseResponse);
       
       console.log('✅ RAG Pipeline Complete!');
+      setPipelineComplete(true);
+      
+      // Keep user-response glowing with completion state, then clear
+      setTimeout(() => {
+        setActiveProcessingNode(null);
+        console.log('🔥 [ACTIVE] Final glow cleared - pipeline fully complete');
+      }, 3000); // 3 seconds to show completion
       
     } catch (error) {
       if (error instanceof Error && error.message === 'Stopped by user') {
@@ -238,6 +281,20 @@ export default function RAGVisualization() {
           </svg>
           Reset
         </button>
+        
+        {/* Research Model Toggle Button */}
+        <button 
+          className={`${styles.statusButton} ${styles.modelToggleButton}`}
+          onClick={handleResearchModelToggle}
+          title={`Current: ${researchModel.toUpperCase()} - Click to cycle through research models`}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          {researchModel.toUpperCase()}
+        </button>
       </div>
       
       <div className={styles.scrollWrapper}>
@@ -264,6 +321,7 @@ export default function RAGVisualization() {
                   node={node} 
                   generatedContent={generatedContent[node.id]}
                   isLoading={loadingNodes.has(node.id)}
+                  isActiveProcessing={currentProcessingNode === node.id}
                 />
               );
             }

@@ -1,16 +1,33 @@
 import { NodeData } from '../data/nodes';
 import styles from '../visualization.module.css';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface GenerativeNodeProps {
   node: NodeData;
   generatedContent?: string;
   isLoading?: boolean;
+  isActiveProcessing?: boolean;
+  isPipelineComplete?: boolean;
 }
 
-export default function GenerativeNode({ node, generatedContent, isLoading = false }: GenerativeNodeProps) {
+export default function GenerativeNode({ node, generatedContent, isLoading = false, isActiveProcessing = false, isPipelineComplete = false }: GenerativeNodeProps) {
+  // Determine node styling class based on state
+  const getNodeClass = () => {
+    let classes = styles.node;
+    if (isPipelineComplete) {
+      classes += ` ${styles.nodeCompletionGlow}`;
+    } else if (isActiveProcessing) {
+      classes += ` ${styles.nodeActiveProcessing}`;
+    } else if (isLoading) {
+      classes += ` ${styles.nodeWaitingLoading}`;
+    }
+    return classes;
+  };
+
   return (
     <div 
-      className={styles.node} 
+      className={getNodeClass()} 
       style={{ 
         left: node.position.left, 
         top: node.position.top 
@@ -18,7 +35,9 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
     >
       <div className={styles.nodeLabel}>
         {node.label}
-        {isLoading && <span style={{ marginLeft: '8px', color: '#9ca3af' }}>⏳ Loading...</span>}
+        {isPipelineComplete && <span style={{ marginLeft: '8px', color: '#f59e0b' }}>✨ Complete!</span>}
+        {isActiveProcessing && !isPipelineComplete && <span style={{ marginLeft: '8px', color: '#3b82f6' }}>🔥 Processing...</span>}
+        {isLoading && !isActiveProcessing && !isPipelineComplete && <span style={{ marginLeft: '8px', color: '#9ca3af' }}>⏳ Loading...</span>}
       </div>
       <div className={styles.generativeContainer}>
         {isLoading ? (
@@ -30,12 +49,13 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
             </div>
           </div>
         ) : (
-          <textarea
-            className={styles.generativeOutput}
-            value={generatedContent || node.content}
-            readOnly
-            rows={4}
-          />
+          <div className={styles.markdownContainer}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+            >
+              {generatedContent || node.content}
+            </ReactMarkdown>
+          </div>
         )}
       </div>
     </div>

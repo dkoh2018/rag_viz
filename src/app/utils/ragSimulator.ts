@@ -3,7 +3,8 @@ export const generateResponse = async (
   nodeId: string, 
   userPrompt: string, 
   shouldStop?: () => boolean,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
+  researchModel: 'exa' | 'perplexity' | 'local' = 'exa'
 ): Promise<string> => {
   try {
     // Check if already aborted before starting
@@ -47,7 +48,8 @@ export const generateResponse = async (
       body: JSON.stringify({
         agentId: nodeId,
         userQuery: userPrompt,
-        context: '' // Can be enhanced later with context passing
+        context: '', // Can be enhanced later with context passing
+        researchModel: researchModel
       }),
       signal: abortSignal // CRITICAL: This will cancel the fetch immediately
     });

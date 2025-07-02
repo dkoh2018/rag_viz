@@ -4,6 +4,7 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { traceable } from 'langsmith/traceable';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { OpenAIEmbeddings } from '@langchain/openai';
+import { performResearch } from './research-tools';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -166,7 +167,8 @@ export const processRAGQuery = traceable(
   async (
     agentId: keyof typeof SYSTEM_PROMPTS, 
     userQuery: string, 
-    context: string = ""
+    context: string = "",
+    researchModel: 'exa' | 'perplexity' | 'local' = 'exa'
   ): Promise<string> => {
     console.log(`🔄 [${agentId}] Starting...`);
     
@@ -180,10 +182,25 @@ export const processRAGQuery = traceable(
       // Build a specific input for each agent based on its role
       switch (agentId) {
         case 'worker-retrieval':
-          console.log(`🔍 [${agentId}] Performing vector search for sub-query: "${userQuery}"`);
-          retrievedContext = await performVectorSearch(userQuery);
-          // This agent's job is to answer based on the retrieved docs for the sub-query.
-          humanMessageContent = `Sub-Query: "${userQuery}"\n\nBased ONLY on the following documents, extract the relevant information verbatim:\n\n${retrievedContext}`;
+          console.log(`🔍 [${agentId}] Performing ${researchModel.toUpperCase()} research for sub-query: "${userQuery}"`);
+          
+          if (researchModel === 'local') {
+            // Use only local vector search for budget-conscious mode
+            console.log(`💾 [${agentId}] Using local-only mode to save costs`);
+            retrievedContext = await performVectorSearch(userQuery);
+          } else {
+            // Try external research first, fallback to vector search if needed
+            try {
+              retrievedContext = await performResearch(userQuery, researchModel);
+              console.log(`✅ [${agentId}] ${researchModel.toUpperCase()} research completed`);
+            } catch (error) {
+              console.error(`❌ [${agentId}] ${researchModel.toUpperCase()} research failed, falling back to vector search:`, error);
+              retrievedContext = await performVectorSearch(userQuery);
+            }
+          }
+          
+          // This agent's job is to answer based on the retrieved information for the sub-query.
+          humanMessageContent = `Sub-Query: "${userQuery}"\n\nBased ONLY on the following ${researchModel === 'local' ? 'local knowledge base' : 'research results'}, extract the relevant information verbatim:\n\n${retrievedContext}`;
           break;
 
         case 'worker-research':

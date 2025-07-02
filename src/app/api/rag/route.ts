@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const requestData = await request.json();
     console.log('📥 [API] Request data:', JSON.stringify(requestData, null, 2));
     
-    const { agentId, userQuery, context } = requestData;
+    const { agentId, userQuery, context, researchModel = 'exa' } = requestData;
 
     if (!agentId || !userQuery) {
       console.error('❌ [API] Missing required fields:', { agentId: !!agentId, userQuery: !!userQuery });
@@ -20,9 +20,10 @@ export async function POST(request: NextRequest) {
 
     console.log(`🎯 [API] Processing query for agent: ${agentId}`);
     console.log(`📝 [API] Query: "${userQuery}"`);
+    console.log(`🔬 [API] Research Model: ${researchModel.toUpperCase()}`);
 
     // Process the query through the specified RAG agent
-    const response = await processRAGQuery(agentId, userQuery, context);
+    const response = await processRAGQuery(agentId, userQuery, context, researchModel);
     
     console.log(`✅ [API] Response from ${agentId}:`, response);
 
