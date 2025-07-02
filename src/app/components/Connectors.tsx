@@ -19,8 +19,8 @@ export default function Connectors() {
 
       {/* Connector paths */}
       <path d="M 480 250 L 590 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1000 250 L 2830 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="1265" y="220" className={styles.connectorLabel}>Simple Query</text>
+      <path d="M 1060 250 L 2725 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <text x="1250" y="230" className={styles.connectorLabel}>Simple Query</text>
       <path d="M 825 450 L 825 560" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
       <text x="730" y="510" className={styles.connectorLabel}>Complex Query</text>
       <path d="M 825 950 L 825 990 L 1035 990 L 1035 1080" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
