@@ -2,24 +2,15 @@
 
 import React from 'react'
 import Link from 'next/link'
-import ParticleCanvas from '@/components/ParticleCanvas'
+import DocumentParticles from '@/components/DocumentParticles'
 
 export default function HomePage() {
   return (
     <div className="relative w-full h-dvh overflow-hidden bg-gradient-to-br from-[#1a1d23] via-[#21262d] to-[#1a1d23]">
       
-      {/* Particle Effect */}
+      {/* Single Unified Particle Document */}
       <div className="absolute inset-0">
-        <ParticleCanvas
-          text="RAG PIPELINE"
-          fontSize={120}
-          fontWeight="bold"
-          fontFamily="Arial, sans-serif"
-          particleCount={4000}
-          scatterColor="white"
-          backgroundColor="transparent"
-          particleColor="#c9d1d9"
-        />
+        <DocumentParticles particleCount={6000} />
       </div>
       
       {/* Demo Button - Top Left */}

@@ -2,33 +2,11 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 
-interface ParticleCanvasProps {
-  text: string
-  fontSize?: number
-  fontWeight?: string
-  fontFamily?: string
+interface DocumentParticlesProps {
   particleCount?: number
-  scatterColor?: string
-  backgroundColor?: string
-  particleColor?: string
-  className?: string
-  disabled?: boolean
-  exclusionZones?: { x: number; y: number; width: number; height: number }[]
 }
 
-export default function ParticleCanvas({
-  text,
-  fontSize = 120,
-  fontWeight = 'bold',
-  fontFamily = 'Arial, sans-serif',
-  particleCount = 2000,
-  scatterColor = 'white',
-  backgroundColor = '#1a1d23',
-  particleColor = '#c9d1d9',
-  className = '',
-  disabled = false,
-  exclusionZones = []
-}: ParticleCanvasProps) {
+export default function DocumentParticles({ particleCount = 6000 }: DocumentParticlesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const mousePositionRef = useRef({ x: 0, y: 0 })
   const isTouchingRef = useRef(false)
@@ -43,10 +21,9 @@ export default function ParticleCanvas({
     if (!ctx) return
 
     const updateCanvasSize = () => {
-      const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width
-      canvas.height = rect.height
-      setIsMobile(rect.width < 768)
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      setIsMobile(window.innerWidth < 768)
     }
 
     updateCanvasSize()
@@ -57,7 +34,6 @@ export default function ParticleCanvas({
       baseX: number
       baseY: number
       size: number
-      color: string
       scatteredColor: string
       life: number
     }[] = []
@@ -70,21 +46,19 @@ export default function ParticleCanvas({
       ctx.fillStyle = 'white'
       ctx.save()
       
-      const currentFontSize = isMobile ? Math.min(fontSize * 0.5, 40) : fontSize
-      ctx.font = `${fontWeight} ${currentFontSize}px ${fontFamily}`
+      // Just RAG PIPELINE - centered
+      const titleFontSize = isMobile ? 60 : 120
+      ctx.font = `bold ${titleFontSize}px Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
+      ctx.fillText('RAG PIPELINE', canvas.width / 2, canvas.height / 2)
       
-      const x = canvas.width / 2
-      const y = canvas.height / 2
-      
-      ctx.fillText(text, x, y)
       ctx.restore()
 
       textImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      return currentFontSize / fontSize
+      return titleFontSize / 120
     }
 
     function createParticle(scale: number) {
@@ -103,8 +77,7 @@ export default function ParticleCanvas({
             baseX: x,
             baseY: y,
             size: Math.random() * 1.5 + 0.8,
-            color: particleColor, 
-            scatteredColor: scatterColor,
+            scatteredColor: 'white',
             life: Math.random() * 100 + 50
           }
         }
@@ -114,8 +87,7 @@ export default function ParticleCanvas({
     }
 
     function createInitialParticles(scale: number) {
-      const targetParticleCount = Math.floor(particleCount * Math.sqrt((canvas.width * canvas.height) / (400 * 300)))
-      for (let i = 0; i < targetParticleCount; i++) {
+      for (let i = 0; i < particleCount; i++) {
         const particle = createParticle(scale)
         if (particle) particles.push(particle)
       }
@@ -124,27 +96,10 @@ export default function ParticleCanvas({
     function animate(scale: number) {
       if (!ctx || !canvas) return
       
-      // Properly clear canvas for transparent backgrounds
-      if (backgroundColor === 'transparent') {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-      } else {
-        ctx.fillStyle = backgroundColor
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-      }
-
-      if (disabled) {
-        // Just draw static particles when disabled
-        for (const p of particles) {
-          ctx.fillStyle = particleColor
-          ctx.fillRect(p.baseX, p.baseY, p.size, p.size)
-        }
-        animationFrameIdRef.current = requestAnimationFrame(() => animate(scale))
-        return
-      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const { x: mouseX, y: mouseY } = mousePositionRef.current
       const maxDistance = 150
-      const mouseInExclusionZone = isMouseInExclusionZone(mouseX, mouseY)
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
@@ -152,8 +107,7 @@ export default function ParticleCanvas({
         const dy = mouseY - p.y
         const distance = Math.sqrt(dx * dx + dy * dy)
 
-        // Skip particle scattering if mouse is in exclusion zone
-        if (!mouseInExclusionZone && distance < maxDistance && (isTouchingRef.current || !('ontouchstart' in window))) {
+        if (distance < maxDistance && (isTouchingRef.current || !('ontouchstart' in window))) {
           const force = (maxDistance - distance) / maxDistance
           const angle = Math.atan2(dy, dx)
           const moveX = Math.cos(angle) * force * 40
@@ -165,7 +119,7 @@ export default function ParticleCanvas({
         } else {
           p.x += (p.baseX - p.x) * 0.08
           p.y += (p.baseY - p.y) * 0.08
-          ctx.fillStyle = particleColor
+          ctx.fillStyle = '#c9d1d9'
         }
 
         ctx.fillRect(p.x, p.y, p.size, p.size)
@@ -183,23 +137,12 @@ export default function ParticleCanvas({
       }
 
       // Maintain particle count
-      const targetParticleCount = Math.floor(particleCount * Math.sqrt((canvas.width * canvas.height) / (400 * 300)))
-      while (particles.length < targetParticleCount) {
+      while (particles.length < particleCount) {
         const newParticle = createParticle(scale)
         if (newParticle) particles.push(newParticle)
       }
 
       animationFrameIdRef.current = requestAnimationFrame(() => animate(scale))
-    }
-
-    // Helper function to check if mouse is in exclusion zone
-    function isMouseInExclusionZone(mouseX: number, mouseY: number): boolean {
-      return exclusionZones.some(zone => 
-        mouseX >= zone.x && 
-        mouseX <= zone.x + zone.width && 
-        mouseY >= zone.y && 
-        mouseY <= zone.y + zone.height
-      )
     }
 
     // Initialize
@@ -216,12 +159,7 @@ export default function ParticleCanvas({
     }
 
     const handleMove = (x: number, y: number) => {
-      if (disabled) return
-      const rect = canvas.getBoundingClientRect()
-      mousePositionRef.current = { 
-        x: x - rect.left, 
-        y: y - rect.top 
-      }
+      mousePositionRef.current = { x, y }
     }
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -236,7 +174,7 @@ export default function ParticleCanvas({
     }
 
     const handleTouchStart = () => {
-      if (!disabled) isTouchingRef.current = true
+      isTouchingRef.current = true
     }
 
     const handleTouchEnd = () => {
@@ -268,13 +206,13 @@ export default function ParticleCanvas({
         cancelAnimationFrame(animationFrameIdRef.current)
       }
     }
-  }, [text, fontSize, fontWeight, fontFamily, particleCount, scatterColor, backgroundColor, particleColor, disabled, isMobile, exclusionZones])
+  }, [isMobile, particleCount])
 
   return (
     <canvas 
       ref={canvasRef} 
-      className={`w-full h-full ${disabled ? 'pointer-events-none' : 'touch-none'} ${className}`}
-      aria-label={`Interactive particle effect with ${text}`}
+      className="w-full h-full"
+      aria-label="Interactive particle document with RAG Pipeline information"
     />
   )
 }
