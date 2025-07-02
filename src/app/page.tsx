@@ -17,6 +17,7 @@ export default function RAGVisualization() {
   const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set());
   const [currentProcessingNode, setCurrentProcessingNode] = useState<string | null>(null);
   const [researchModel, setResearchModel] = useState<'exa' | 'perplexity' | 'local'>('exa');
+  const [showFinalResponseGlow, setShowFinalResponseGlow] = useState(false);
 
   // Helper functions for loading state management
   const addLoadingNode = (nodeId: string) => {
@@ -133,6 +134,7 @@ export default function RAGVisualization() {
     setUserPrompt(prompt);
     setIsProcessing(true);
     setShouldStop(false);
+    setShowFinalResponseGlow(false); // Reset green glow when starting new processing
     
     const newContent: Record<string, string> = {};
     const updateContent = (nodeId: string, content: string) => {
@@ -296,11 +298,12 @@ export default function RAGVisualization() {
         console.log('✅ Complex Query Pipeline Complete (fallback)!');
       }
       
-      // Keep user-response glowing with completion state, then clear
+      // Keep user-response glowing with completion state, then show green glow
       setTimeout(() => {
         setActiveProcessingNode(null);
-        console.log('🔥 [ACTIVE] Final glow cleared - pipeline fully complete');
-      }, 3000); // 3 seconds to show completion
+        setShowFinalResponseGlow(true);
+        console.log('🔥 [ACTIVE] Final glow cleared - showing green completion glow');
+      }, 3000); // 3 seconds to show completion, then green glow
       
     } catch (error) {
       if (error instanceof Error && error.message === 'Stopped by user') {
@@ -397,6 +400,8 @@ export default function RAGVisualization() {
                   generatedContent={generatedContent[node.id]}
                   isLoading={loadingNodes.has(node.id)}
                   isActiveProcessing={currentProcessingNode === node.id}
+                  isPipelineComplete={!isProcessing && generatedContent[node.id] && !showFinalResponseGlow}
+                  showReadyGlow={node.id === 'user-response' && showFinalResponseGlow}
                 />
               );
             }

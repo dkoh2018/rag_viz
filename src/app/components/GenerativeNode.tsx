@@ -9,13 +9,16 @@ interface GenerativeNodeProps {
   isLoading?: boolean;
   isActiveProcessing?: boolean;
   isPipelineComplete?: boolean;
+  showReadyGlow?: boolean;
 }
 
-export default function GenerativeNode({ node, generatedContent, isLoading = false, isActiveProcessing = false, isPipelineComplete = false }: GenerativeNodeProps) {
+export default function GenerativeNode({ node, generatedContent, isLoading = false, isActiveProcessing = false, isPipelineComplete = false, showReadyGlow = false }: GenerativeNodeProps) {
   // Determine node styling class based on state
   const getNodeClass = () => {
     let classes = styles.node;
-    if (isPipelineComplete) {
+    if (showReadyGlow) {
+      classes += ` ${styles.nodeReadyStart}`;
+    } else if (isPipelineComplete) {
       classes += ` ${styles.nodeCompletionGlow}`;
     } else if (isActiveProcessing) {
       classes += ` ${styles.nodeActiveProcessing}`;

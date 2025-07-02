@@ -1,4 +1,4 @@
-// Simple RAG backend for direct query processing
+// Advanced RAG backend for direct query processing with expert-level prompts for visualization
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { traceable } from 'langsmith/traceable';
@@ -7,150 +7,133 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// Simple, direct system prompts optimized for straightforward responses
-export const SIMPLE_SYSTEM_PROMPTS = {
-  'router-agent': `You are a Router Agent. Analyze the user's query and determine if it needs:
-    - 'simple': Direct retrieval and response (factual questions, definitions)
-    - 'complex': Multi-step reasoning, synthesis, or analysis
-    
-    Examples:
-    Simple: "What is X?", "Define Y", "List the features of Z"
-    Complex: "Compare X and Y", "How does A relate to B?", "Analyze the impact of C"
-    
-    Respond with only: "simple" or "complex"`,
+// Expert-level system prompts optimized for clarity, with all agents included for visual tracing.
+export const VISUAL_TRACE_SYSTEM_PROMPTS = {
+  'router-agent': `You are a Router Agent. Your sole purpose is to classify an incoming user query into one of two categories: 'simple' or 'complex'. Your analysis must be swift and accurate for the system diagram.
 
-  'direct-generation': `You are a Direct Response Agent. Provide a clear, concise answer to the user's question.
-    
-    Rules:
-    - Give direct, factual answers
-    - Be concise but complete
-    - If you don't know something, say so
-    - Use simple, clear language
-    - Don't over-explain unless needed`,
+## Categories:
+- 'simple': The query asks for a specific, factual piece of information.
+- 'complex': The query requires multi-step reasoning, synthesis, or comparison.
 
-  'response-delivery': `You are a Response Delivery Agent. Format the response clearly for the user.
-    
-    Take the provided answer and ensure it's:
-    - Well-formatted and easy to read
-    - Professional but approachable
-    - Complete and helpful
-    
-    Simply return the formatted response.`,
+## Instructions:
+1.  Analyze the user query.
+2.  Respond with ONLY the single word 'simple' or 'complex'. Do not add any other text.`,
 
-  'langsmith-logging': `You are a Logging Agent. Log this interaction for monitoring.
-    
-    Return: "✅ Simple query processed and logged successfully"`,
+  'direct-generation': `You are a Contextual Generation Agent. Your task is to answer the user's question based *exclusively* on the information provided in the <context> tags.
 
-  'user-response': `You are the Final Response Agent. Present the answer to the user.
+## Instructions:
+1.  Analyze the user's question inside the <query> tags.
+2.  Read the provided <context> to find the answer.
+3.  Synthesize a direct, factual answer using only information from the context.
+4.  If the answer is not present, state: "The provided context does not contain an answer to this question."
+
+## Constraints:
+- CRITICAL: Do NOT use any external knowledge.
+- Do not make assumptions or infer information not explicitly stated.`,
+
+  'response-delivery': `You are a Response Delivery Agent. Your job is to format the raw answer for presentation.
+
+## Instructions:
+1.  Take the raw answer provided in the <raw_answer> tags.
+2.  Format it to be clear and well-structured. Use markdown (e.g., bullet points) if it improves clarity.
+3.  Ensure the tone is professional and helpful.
+4.  Do not change the factual content of the answer. You are only responsible for its presentation.
+5.  Return only the final, formatted response.`,
     
-    Return the final, polished response ready for the user.`
+  'langsmith-logging': `You are a Logging Agent within a visual workflow. Your function is to signal that the main query processing is complete and has been logged. This is a final step in the trace.
+
+## Instructions:
+1. You will be given the original query and the final response as context.
+2. Your task is to output a single, specific confirmation message.
+3. Return the *exact* string: "✅ Query processed and logged successfully"
+
+## Constraints:
+- Do NOT output any other text or information.
+- Your response must be the exact success message.`,
+
+  'user-response': `You are the Final Presentation Agent. You represent the last step where the system hands off the polished answer to the user interface.
+
+## Instructions:
+1. You will receive the final, formatted response in the <final_response> tags.
+2. Your job is to act as a final gate, simply passing this response through.
+3. Return the response exactly as you received it, without any changes or additions.`,
 };
 
-// Initialize lightweight LLM for simple queries
+// Initialize lightweight LLM (no changes needed here)
 const initializeSimpleLLM = () => {
   return new ChatOpenAI({
     model: 'gpt-4o-mini',
-    temperature: 0.3, // Lower temperature for more consistent simple responses
-    maxTokens: 1000,   // Smaller token limit for simple responses
+    temperature: 0.2,
+    maxTokens: 1000,
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 };
 
-// Lightweight vector search for simple queries
+// Lightweight vector search (no changes needed here)
 const performSimpleVectorSearch = traceable(
   async (query: string, topK: number = 2): Promise<string> => {
     try {
       const vectorStorePath = path.join(process.cwd(), 'vectorstore', 'rag-store.index');
+      if (!fs.existsSync(vectorStorePath)) return 'No document context available';
       
-      if (!fs.existsSync(vectorStorePath)) {
-        console.log('📋 [SIMPLE VECTOR] No vector store found');
-        return 'No document context available';
-      }
-      
-      console.log(`🔍 [SIMPLE VECTOR] Quick search for: "${query}"`);
-      
-      const embeddings = new OpenAIEmbeddings({
-        openAIApiKey: process.env.OPENAI_API_KEY,
-      });
-      
+      const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY });
       const vectorStore = await HNSWLib.load(vectorStorePath, embeddings);
       const retriever = vectorStore.asRetriever({ k: topK });
-      
       const relevantDocs = await retriever.getRelevantDocuments(query);
       
       const context = relevantDocs
         .map((doc, index) => `[Source ${index + 1}]: ${doc.pageContent}`)
         .join('\n\n');
       
-      console.log(`📄 [SIMPLE VECTOR] Found ${relevantDocs.length} relevant documents`);
-      
       return context || 'No relevant documents found';
-      
     } catch (error) {
-      console.error('💥 [SIMPLE VECTOR] Error:', error);
+      console.error('💥 [VECTOR] Error:', error);
       return 'Vector search unavailable';
     }
   },
-  {
-    name: 'performSimpleVectorSearch',
-    tags: ['vector-search', 'simple', 'langchain'],
-  }
+  { name: 'performSimpleVectorSearch', tags: ['vector-search', 'simple', 'langchain'] }
 );
 
-// Simple RAG query processing - optimized for direct responses
-export const processSimpleRAGQuery = traceable(
+// Main processing function with all agent steps restored for visualization
+export const processVisualRAGQuery = traceable(
   async (
-    agentId: keyof typeof SIMPLE_SYSTEM_PROMPTS, 
+    agentId: keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, 
     userQuery: string, 
     context: string = ""
   ): Promise<string> => {
-    console.log(`🚀 [SIMPLE] Processing ${agentId} for direct response`);
+    console.log(`🚀 [VISUAL TRACE] Running agent "${agentId}"`);
     
     try {
       const llm = initializeSimpleLLM();
-      const systemPrompt = SIMPLE_SYSTEM_PROMPTS[agentId] || 'You are a helpful AI assistant.';
+      const systemPrompt = VISUAL_TRACE_SYSTEM_PROMPTS[agentId];
       let humanMessageContent = '';
 
-      // Simple, direct processing based on agent type
       switch (agentId) {
         case 'router-agent':
           humanMessageContent = `User Query: "${userQuery}"`;
           break;
 
         case 'direct-generation':
-          // Get context from vector search for direct generation
           const retrievedContext = await performSimpleVectorSearch(userQuery);
-          humanMessageContent = `User Question: "${userQuery}"
+          humanMessageContent = `<query>${userQuery}</query>
           
-Available Context:
+<context>
 ${retrievedContext}
-
-Provide a direct, helpful answer based on the context. If the context doesn't contain the answer, provide a general response based on your knowledge.`;
+</context>`;
           break;
 
         case 'response-delivery':
-          humanMessageContent = `User Question: "${userQuery}"
-
-Response to format:
-${context}
-
-Format this response clearly for the user.`;
+          humanMessageContent = `<raw_answer>${context}</raw_answer>`;
           break;
 
         case 'langsmith-logging':
-          humanMessageContent = `Log this simple query interaction:
+          humanMessageContent = `The interaction to log is:
 Query: "${userQuery}"
-Response: "${context}"`;
+Final Response: "${context}"`;
           break;
 
         case 'user-response':
-          humanMessageContent = `Present this final response to the user:
-${context}`;
-          break;
-
-        default:
-          humanMessageContent = `User Query: "${userQuery}"
-${context ? `Context: ${context}` : ''}`;
+          humanMessageContent = `<final_response>${context}</final_response>`;
           break;
       }
       
@@ -159,22 +142,19 @@ ${context ? `Context: ${context}` : ''}`;
         new HumanMessage(humanMessageContent)
       ];
       
-      console.log(`⚡ [SIMPLE] Making direct LLM call for ${agentId}`);
+      console.log(`⚡ [LLM CALL] Invoking model for agent "${agentId}"`);
       
       const response = await llm.invoke(messages);
       const result = response.content.toString();
       
-      console.log(`✅ [SIMPLE] ${agentId} completed: "${result.substring(0, 100)}..."`);
+      console.log(`✅ [COMPLETE] Agent "${agentId}" finished.`);
       
       return result;
       
     } catch (error) {
-      console.error(`💥 [SIMPLE] Error in ${agentId}:`, error);
-      return `[SIMPLE ERROR in ${agentId}]: ${error instanceof Error ? error.message : String(error)}`;
+      console.error(`💥 [ERROR] in agent "${agentId}":`, error);
+      return `[ERROR in ${agentId}]: ${error instanceof Error ? error.message : String(error)}`;
     }
   },
-  {
-    name: 'processSimpleRAGQuery',
-    tags: ['rag', 'simple', 'langchain'],
-  }
+  { name: 'processVisualRAGQuery', tags: ['rag', 'visual-trace', 'langchain'] }
 );

@@ -72,6 +72,11 @@
   transition: all 0.2s ease-in-out;
 }
 
+/* Worker Agent nodes - 75% wider */
+.node.nodeWorkerAgent {
+  width: 787px !important; /* 450px * 1.75 = 787px */
+}
+
 .node:hover {
   background-color: #1c2128;
   border-color: #373e47;

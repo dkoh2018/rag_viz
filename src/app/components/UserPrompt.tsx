@@ -126,6 +126,8 @@ export default function UserPrompt({ node, onPromptSubmit, isProcessing = false,
       </div>
       <div className={styles.userPromptContainer}>
         <textarea
+          id="user-prompt-input"
+          name="userPrompt"
           className={`${styles.userPromptInput} ${isProcessing ? styles.userPromptDisabled : ''}`}
           value={displayPrompt}
           onChange={handleInputChange}
