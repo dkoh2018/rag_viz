@@ -4,6 +4,7 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { traceable } from 'langsmith/traceable';
 import { HNSWLib } from '@langchain/community/vectorstores/hnswlib';
 import { OpenAIEmbeddings } from '@langchain/openai';
+import { performResearch } from './research-tools';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -19,17 +20,22 @@ export const VISUAL_TRACE_SYSTEM_PROMPTS = {
 1.  Analyze the user query.
 2.  Respond with ONLY the single word 'simple' or 'complex'. Do not add any other text.`,
 
-  'direct-generation': `You are a Contextual Generation Agent. Your task is to answer the user's question based *exclusively* on the information provided in the <context> tags.
+  'direct-generation': `You are a Direct Answer Agent. Your task is to provide direct, concise answers to simple questions using your knowledge.
 
 ## Instructions:
-1.  Analyze the user's question inside the <query> tags.
-2.  Read the provided <context> to find the answer.
-3.  Synthesize a direct, factual answer using only information from the context.
-4.  If the answer is not present, state: "The provided context does not contain an answer to this question."
+1. Read the user's question.
+2. Provide a clear, direct answer to the question.
+3. Keep your response concise and factual.
+4. For basic math, facts, definitions, or simple questions, answer directly.
+
+## Examples:
+- "What is 2+2?" → "2+2 equals 4."
+- "What is machine learning?" → "Machine learning is a subset of artificial intelligence..."
+- "What is the capital of France?" → "The capital of France is Paris."
 
 ## Constraints:
-- CRITICAL: Do NOT use any external knowledge.
-- Do not make assumptions or infer information not explicitly stated.`,
+- Keep answers brief and to the point.
+- Provide accurate information for simple queries.`,
 
   'response-delivery': `You are a Response Delivery Agent. Your job is to format the raw answer for presentation.
 
@@ -99,7 +105,8 @@ export const processVisualRAGQuery = traceable(
   async (
     agentId: keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, 
     userQuery: string, 
-    context: string = ""
+    context: string = "",
+    researchModel: 'exa' | 'perplexity' | 'local' = 'exa'
   ): Promise<string> => {
     console.log(`🚀 [VISUAL TRACE] Running agent "${agentId}"`);
     
@@ -114,12 +121,8 @@ export const processVisualRAGQuery = traceable(
           break;
 
         case 'direct-generation':
-          const retrievedContext = await performSimpleVectorSearch(userQuery);
-          humanMessageContent = `<query>${userQuery}</query>
-          
-<context>
-${retrievedContext}
-</context>`;
+          console.log(`💭 [${agentId}] Generating direct answer for: "${userQuery}"`);
+          humanMessageContent = `User Question: "${userQuery}"`;
           break;
 
         case 'response-delivery':
