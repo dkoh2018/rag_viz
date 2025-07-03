@@ -21,6 +21,8 @@ export default function RAGVisualization() {
   const [isSimultaneousWorking, setIsSimultaneousWorking] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showZoomDropdown, setShowZoomDropdown] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<'gpt-4o-mini' | 'gpt-4o' | 'gpt-4.1' | 'gpt-4.1-mini' | 'gpt-4.1-nano'>('gpt-4o-mini');
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   // Helper functions for loading state management
   const addLoadingNode = (nodeId: string) => {
@@ -119,6 +121,16 @@ export default function RAGVisualization() {
     setShowZoomDropdown(!showZoomDropdown);
   };
 
+  const handleModelSelect = (model: 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4.1' | 'gpt-4.1-mini' | 'gpt-4.1-nano') => {
+    setSelectedModel(model);
+    setShowModelDropdown(false);
+    console.log(`🤖 [MODEL] Switched to ${model}`);
+  };
+
+  const toggleModelDropdown = () => {
+    setShowModelDropdown(!showModelDropdown);
+  };
+
   // Auto-zoom for small screens
   useEffect(() => {
     const checkScreenSize = () => {
@@ -135,20 +147,23 @@ export default function RAGVisualization() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showZoomDropdown) {
-        const target = event.target as Element;
-        if (!target.closest(`.${styles.zoomDropdownContainer}`)) {
-          setShowZoomDropdown(false);
-        }
+      const target = event.target as Element;
+      
+      if (showZoomDropdown && !target.closest(`.${styles.zoomDropdownContainer}`)) {
+        setShowZoomDropdown(false);
+      }
+      
+      if (showModelDropdown && !target.closest(`.${styles.modelDropdownContainer}`)) {
+        setShowModelDropdown(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showZoomDropdown]);
+  }, [showZoomDropdown, showModelDropdown]);
 
   // Wrapper function to track loading state for individual nodes
   const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal, context: string = '') => {
@@ -430,6 +445,38 @@ ${analysisResponse}
           </svg>
           Reset
         </button>
+
+        {/* Model Chooser Button */}
+        <div className={styles.modelDropdownContainer}>
+          <button 
+            className={`${styles.statusButton} ${styles.modelChooserButton}`}
+            onClick={toggleModelDropdown}
+            title="Select AI model"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+            {selectedModel}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ marginLeft: '4px' }}>
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          {showModelDropdown && (
+            <div className={styles.modelDropdown}>
+              {['gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano'].map((model) => (
+                <button
+                  key={model}
+                  className={`${styles.modelDropdownItem} ${selectedModel === model ? styles.modelDropdownItemActive : ''}`}
+                  onClick={() => handleModelSelect(model as 'gpt-4o-mini' | 'gpt-4o' | 'gpt-4.1' | 'gpt-4.1-mini' | 'gpt-4.1-nano')}
+                >
+                  {model}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         
         {/* Research Model Toggle Button */}
         <button 

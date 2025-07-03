@@ -59,7 +59,7 @@
     transform: scale(0.3);
     width: 4500px;
     height: 1600px;
-    margin: 80px 1rem 2rem 1rem; /* Increased top margin to avoid button overlap */
+    margin: 100px 1rem 2rem 1rem; /* Increased top margin for 4 buttons */
   }
   
   .scrollWrapper {
@@ -73,7 +73,7 @@
     transform: scale(0.5);
     width: 4500px;
     height: 1600px;
-    margin: 70px 2rem 3rem 2rem; /* Adjusted margin for tablet */
+    margin: 80px 2rem 3rem 2rem; /* Adjusted margin for tablet with 4 buttons */
   }
 }
 
@@ -263,8 +263,9 @@
   .controlButtons {
     top: 10px;
     left: 10px;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
+    max-width: calc(100vw - 20px);
   }
 }
 
@@ -272,7 +273,14 @@
   .controlButtons {
     top: 15px;
     left: 15px;
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 1025px) {
+  .controlButtons {
+    flex-wrap: nowrap;
   }
 }
 
@@ -308,22 +316,88 @@
 /* Responsive button sizing */
 @media (max-width: 768px) {
   .statusButton {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    gap: 6px;
+    padding: 6px 8px;
+    font-size: 0.7rem;
+    gap: 4px;
     border-radius: 10px;
     /* Enhanced touch targets for mobile */
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    min-height: 36px;
+  }
+  
+  .modelChooserButton {
+    min-width: 110px !important;
+    font-size: 0.65rem !important;
+    padding: 6px 8px !important;
+    gap: 3px !important;
+  }
+  
+  .researchModelButton {
+    min-width: 80px !important;
+    font-size: 0.7rem !important;
+  }
+  
+  .modelDropdown {
+    min-width: 120px;
+    border-radius: 12px;
+    margin-top: 6px;
+  }
+  
+  .modelDropdownItem {
+    padding: 8px 10px;
+    font-size: 0.65rem;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .modelDropdownItem:first-child {
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .modelDropdownItem:last-child {
+    border-radius: 0 0 12px 12px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .statusButton {
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    gap: 7px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    gap: 6px;
     border-radius: 11px;
+  }
+  
+  .modelChooserButton {
+    min-width: 120px !important;
+    font-size: 0.75rem !important;
+  }
+  
+  .researchModelButton {
+    min-width: 100px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .modelDropdown {
+    min-width: 125px;
+    border-radius: 14px;
+  }
+  
+  .modelDropdownItem {
+    padding: 9px 11px;
+    font-size: 0.75rem;
+  }
+  
+  .modelDropdownItem:first-child {
+    border-radius: 14px 14px 0 0;
+  }
+  
+  .modelDropdownItem:last-child {
+    border-radius: 0 0 14px 14px;
   }
 }
 
@@ -803,6 +877,148 @@
               0 4px 12px rgba(255, 255, 255, 0.15) inset,
               0 0 30px rgba(107, 114, 128, 0.2);
   transform: translateY(-2px) scale(1.02);
+}
+
+/* Model Chooser Button */
+.modelChooserButton {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5e7eb;
+  cursor: pointer;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
+  min-width: 140px;
+  justify-content: center;
+  font-size: 0.8rem;
+  gap: 6px;
+}
+
+.modelChooserButton::before {
+  opacity: 0.7;
+}
+
+.modelChooserButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.modelChooserButton:hover::before {
+  opacity: 0.8;
+}
+
+.modelChooserButton:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Model Dropdown */
+.modelDropdownContainer {
+  position: relative;
+}
+
+.modelDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+              0 8px 24px rgba(0, 0, 0, 0.2),
+              0 2px 8px rgba(255, 255, 255, 0.1) inset;
+  z-index: 1001;
+  min-width: 140px;
+  overflow: hidden;
+  animation: modelDropdownSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modelDropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modelDropdownItem {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.modelDropdownItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modelDropdownItem:first-child {
+  border-radius: 16px 16px 0 0;
+}
+
+.modelDropdownItem:last-child {
+  border-radius: 0 0 16px 16px;
+}
+
+.modelDropdownItem:only-child {
+  border-radius: 16px;
+}
+
+.modelDropdownItem:hover::before {
+  opacity: 1;
+}
+
+.modelDropdownItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.modelDropdownItemActive {
+  background: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2) inset;
+}
+
+.modelDropdownItemActive::before {
+  background: rgba(59, 130, 246, 0.2);
+  opacity: 1;
+}
+
+.modelDropdownItemActive:hover {
+  background: rgba(59, 130, 246, 0.5);
+  transform: translateX(2px);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3) inset,
+              0 0 15px rgba(59, 130, 246, 0.2);
 }
 
 .promptButtons {
