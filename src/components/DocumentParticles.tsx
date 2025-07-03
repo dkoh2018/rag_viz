@@ -10,6 +10,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const mousePositionRef = useRef({ x: 0, y: 0 })
   const isTouchingRef = useRef(false)
+  const isMouseOverCanvasRef = useRef(false)
   const animationFrameIdRef = useRef<number | undefined>(undefined)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -46,12 +47,17 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
       ctx.fillStyle = 'white'
       ctx.save()
       
-      // Just RAG PIPELINE - centered
+      // Two lines: VISUALIZE on top, RAG PIPELINE on bottom
       const titleFontSize = isMobile ? 60 : 120
       ctx.font = `bold ${titleFontSize}px Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText('RAG PIPELINE', canvas.width / 2, canvas.height / 2)
+      
+      const lineSpacing = titleFontSize * 1.2
+      const centerY = canvas.height / 2
+      
+      ctx.fillText('VISUALIZE', canvas.width / 2, centerY - lineSpacing / 2)
+      ctx.fillText('RAG PIPELINE', canvas.width / 2, centerY + lineSpacing / 2)
       
       ctx.restore()
 
@@ -107,7 +113,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
         const dy = mouseY - p.y
         const distance = Math.sqrt(dx * dx + dy * dy)
 
-        if (distance < maxDistance && (isTouchingRef.current || !('ontouchstart' in window))) {
+        if (distance < maxDistance && (isTouchingRef.current || (isMouseOverCanvasRef.current && !('ontouchstart' in window)))) {
           const force = (maxDistance - distance) / maxDistance
           const angle = Math.atan2(dy, dx)
           const moveX = Math.cos(angle) * force * 40
@@ -163,6 +169,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
     }
 
     const handleMouseMove = (e: MouseEvent) => {
+      isMouseOverCanvasRef.current = true
       handleMove(e.clientX, e.clientY)
     }
 
@@ -183,15 +190,18 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
     }
 
     const handleMouseLeave = () => {
-      if (!('ontouchstart' in window)) {
-        mousePositionRef.current = { x: canvas.width / 2, y: canvas.height / 2 }
-      }
+      isMouseOverCanvasRef.current = false
+    }
+
+    const handleMouseEnter = () => {
+      isMouseOverCanvasRef.current = true
     }
 
     window.addEventListener('resize', handleResize)
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
     canvas.addEventListener('mouseleave', handleMouseLeave)
+    canvas.addEventListener('mouseenter', handleMouseEnter)
     canvas.addEventListener('touchstart', handleTouchStart)
     canvas.addEventListener('touchend', handleTouchEnd)
 
@@ -200,6 +210,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
       canvas.removeEventListener('mousemove', handleMouseMove)
       canvas.removeEventListener('touchmove', handleTouchMove)
       canvas.removeEventListener('mouseleave', handleMouseLeave)
+      canvas.removeEventListener('mouseenter', handleMouseEnter)
       canvas.removeEventListener('touchstart', handleTouchStart)
       canvas.removeEventListener('touchend', handleTouchEnd)
       if (animationFrameIdRef.current) {
