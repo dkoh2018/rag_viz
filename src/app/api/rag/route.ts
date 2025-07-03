@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     
     if (simpleAgents.includes(agentId)) {
       console.log(`🚀 [API] Using SIMPLE backend for ${agentId}`);
-      response = await processVisualRAGQuery(agentId as keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, userQuery, context, researchModel);
+      response = await processVisualRAGQuery(agentId as keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, userQuery, context);
     } else if (complexAgents.includes(agentId)) {
       console.log(`🚀 [API] Using COMPLEX backend for ${agentId}`);
       response = await processComplexRAGQuery(agentId, userQuery, context, researchModel);

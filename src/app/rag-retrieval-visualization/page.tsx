@@ -522,7 +522,7 @@ ${analysisResponse}
                   generatedContent={generatedContent[node.id]}
                   isLoading={loadingNodes.has(node.id)}
                   isActiveProcessing={currentProcessingNode === node.id}
-                  isPipelineComplete={!isProcessing && generatedContent[node.id] && !showFinalResponseGlow}
+                  isPipelineComplete={!isProcessing && !!generatedContent[node.id] && !showFinalResponseGlow}
                   showReadyGlow={node.id === 'response-delivery' && showFinalResponseGlow}
                   isSimultaneousWorking={isWorkerAgent && isSimultaneousWorking}
                 />
