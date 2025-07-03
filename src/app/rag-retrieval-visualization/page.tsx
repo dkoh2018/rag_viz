@@ -108,9 +108,6 @@ export default function RAGVisualization() {
     setZoomLevel(prev => Math.max(prev - 0.2, 0.1)); // Min zoom 0.1x
   };
 
-  const resetZoom = () => {
-    setZoomLevel(1);
-  };
 
   const setPresetZoom = (zoom: number) => {
     setZoomLevel(zoom);

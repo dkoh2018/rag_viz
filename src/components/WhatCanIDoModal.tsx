@@ -65,9 +65,9 @@ export default function WhatCanIDoModal({ isOpen, onClose }: WhatCanIDoModalProp
               <div className="bg-white/5 rounded-xl p-5 border border-white/15 backdrop-blur-sm">
                 <p className="text-sm text-gray-400 mb-3 font-medium">Try asking:</p>
                 <ul className="text-sm space-y-2 text-gray-300">
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>"How do neural networks learn?"</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>"What are the latest developments in quantum computing?"</li>
-                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>"Compare different approaches to climate change mitigation"</li>
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>&ldquo;How do neural networks learn?&rdquo;</li>
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>&ldquo;What are the latest developments in quantum computing?&rdquo;</li>
+                  <li className="flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-white/40"></span>&ldquo;Compare different approaches to climate change mitigation&rdquo;</li>
                 </ul>
               </div>
             </div>

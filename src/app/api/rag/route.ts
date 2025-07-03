@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processVisualRAGQuery } from '@/lib/rag-backend-simple';
+import { processVisualRAGQuery, VISUAL_TRACE_SYSTEM_PROMPTS } from '@/lib/rag-backend-simple';
 import { processComplexRAGQuery } from '@/lib/rag-backend-complex';
 
 export async function POST(request: NextRequest) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     
     if (simpleAgents.includes(agentId)) {
       console.log(`🚀 [API] Using SIMPLE backend for ${agentId}`);
-      response = await processVisualRAGQuery(agentId as any, userQuery, context, researchModel);
+      response = await processVisualRAGQuery(agentId as keyof typeof VISUAL_TRACE_SYSTEM_PROMPTS, userQuery, context, researchModel);
     } else if (complexAgents.includes(agentId)) {
       console.log(`🚀 [API] Using COMPLEX backend for ${agentId}`);
       response = await processComplexRAGQuery(agentId, userQuery, context, researchModel);
