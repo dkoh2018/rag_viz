@@ -88,16 +88,34 @@
 
 .node {
   position: absolute;
-  background-color: #161b22;
-  border: 1px solid #30363d;
-  color: #c9d1d9;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
   padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+              0 8px 24px rgba(0, 0, 0, 0.2),
+              0 2px 8px rgba(255, 255, 255, 0.1) inset;
   z-index: 10;
   width: 450px;
   height: 338px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.node::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: inherit;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 /* Worker Agent nodes - 75% wider */
@@ -105,27 +123,78 @@
   width: 787px !important; /* 450px * 1.75 = 787px */
 }
 
+/* Mobile responsive node styling */
+@media (max-width: 768px) {
+  .node {
+    border-radius: 14px;
+    /* Enhanced backdrop for better visibility on mobile */
+    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Better mobile shadows */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 
+                0 12px 30px rgba(0, 0, 0, 0.3),
+                0 4px 12px rgba(255, 255, 255, 0.15) inset;
+  }
+  
+  .node:hover {
+    transform: translateY(-2px) scale(1.005);
+  }
+  
+  .nodeLabel {
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  
+  .nodeContent {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .node {
+    border-radius: 15px;
+    backdrop-filter: blur(22px) saturate(165%);
+  }
+  
+  .node:hover {
+    transform: translateY(-2.5px) scale(1.008);
+  }
+}
+
 .node:hover {
-  background-color: #1c2128;
-  border-color: #373e47;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 
+              0 12px 30px rgba(0, 0, 0, 0.3),
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+.node:hover::before {
+  opacity: 1;
 }
 
 .nodeLabel {
+  position: relative;
+  z-index: 1;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #c9d1d9;
+  color: #ffffff;
   margin-bottom: 1rem;
   text-align: left;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .nodeContent {
+  position: relative;
+  z-index: 1;
   font-size: 0.9rem;
   font-weight: 400;
-  color: #8b949e;
+  color: #e5e7eb;
   text-align: left;
   line-height: 1.5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .connectorLabel {
@@ -208,16 +277,32 @@
 }
 
 .statusButton {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   font-family: var(--font-inter), sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px) saturate(150%);
+  overflow: hidden;
+}
+
+.statusButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: inherit;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 /* Responsive button sizing */
@@ -226,6 +311,10 @@
     padding: 8px 12px;
     font-size: 0.8rem;
     gap: 6px;
+    border-radius: 10px;
+    /* Enhanced touch targets for mobile */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
 
@@ -234,35 +323,55 @@
     padding: 10px 16px;
     font-size: 0.85rem;
     gap: 7px;
+    border-radius: 11px;
   }
 }
 
-/* Ready State - OpenAI style dark grey/transparent */
+/* Ready State - Glass effect */
 .statusButtonReady {
-  background: rgba(55, 65, 81, 0.3);
-  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5e7eb;
   cursor: not-allowed;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
 }
 
 .statusButtonReady:disabled {
+  opacity: 0.6;
+}
+
+.statusButtonReady::before {
   opacity: 0.7;
 }
 
-/* Stop State - Red for active processing */
+/* Stop State - Glass effect with red accent */
 .statusButtonStop {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ffffff;
   cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset,
+              0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+.statusButtonStop::before {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, transparent 50%, rgba(239, 68, 68, 0.1) 100%);
+  opacity: 1;
 }
 
 .statusButtonStop:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-  transform: translateY(-1px);
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 30px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.statusButtonStop:hover::before {
+  opacity: 0.8;
 }
 
 /* Zoom Controls */
@@ -460,34 +569,54 @@
   }
   
   .zoomButton {
-    width: 36px;
-    height: 36px;
-    font-size: 0.7rem;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    /* Enhanced touch targets for mobile */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   
   .zoomPercentButton {
-    min-width: 58px !important;
-    padding: 0 8px !important;
+    min-width: 65px !important;
+    padding: 0 10px !important;
+    /* Better touch handling */
+    -webkit-tap-highlight-color: transparent;
   }
   
   .zoomDropdown {
-    min-width: 75px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    min-width: 85px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    /* Enhanced backdrop for better visibility on mobile */
+    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Better mobile shadows */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 
+                0 12px 30px rgba(0, 0, 0, 0.3),
+                0 4px 12px rgba(255, 255, 255, 0.15) inset;
   }
   
   .zoomDropdownItem {
-    padding: 8px 12px;
-    font-size: 0.7rem;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    /* Better touch handling */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* iOS touch target guideline */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .zoomDropdownItem:first-child {
-    border-radius: 12px 12px 0 0;
+    border-radius: 14px 14px 0 0;
   }
   
   .zoomDropdownItem:last-child {
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 14px 14px;
   }
 }
 
@@ -535,83 +664,145 @@
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Reset Button - Always grey/transparent like Ready state */
+/* Reset Button - Glass effect */
 .resetButton {
-  background: rgba(55, 65, 81, 0.3);
-  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5e7eb;
   cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
+}
+
+.resetButton::before {
+  opacity: 0.7;
 }
 
 .resetButton:hover {
-  background: rgba(55, 65, 81, 0.5);
-  color: #d1d5db;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.resetButton:hover::before {
+  opacity: 0.8;
 }
 
 .resetButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
 }
 
-/* Research Model Chooser Button */
+/* Research Model Chooser Button - Base glass effect */
 .researchModelButton {
-  background: rgba(55, 65, 81, 0.3);
-  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5e7eb;
   cursor: pointer;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
   min-width: 120px;
   justify-content: center;
   font-size: 0.85rem;
 }
 
+.researchModelButton::before {
+  opacity: 0.7;
+}
+
 .researchModelButton:hover {
-  background: rgba(55, 65, 81, 0.5);
-  color: #d1d5db;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.researchModelButton:hover::before {
+  opacity: 0.8;
 }
 
 .researchModelButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
 }
 
-/* Research Model States */
+/* Research Model States - Glass effect with colored accents */
 .researchModelExa {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.15);
+  color: #ffffff;
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset,
+              0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.researchModelExa::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, transparent 50%, rgba(59, 130, 246, 0.1) 100%);
+  opacity: 1;
 }
 
 .researchModelExa:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 30px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .researchModelPerplexity {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.15);
+  color: #ffffff;
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset,
+              0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.researchModelPerplexity::before {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, transparent 50%, rgba(16, 185, 129, 0.1) 100%);
+  opacity: 1;
 }
 
 .researchModelPerplexity:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 30px rgba(16, 185, 129, 0.2);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .researchModelLocal {
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-  color: white;
-  border-color: rgba(107, 114, 128, 0.3);
+  background: rgba(107, 114, 128, 0.15);
+  color: #ffffff;
+  border-color: rgba(107, 114, 128, 0.4);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset,
+              0 0 20px rgba(107, 114, 128, 0.1);
+}
+
+.researchModelLocal::before {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, transparent 50%, rgba(107, 114, 128, 0.1) 100%);
+  opacity: 1;
 }
 
 .researchModelLocal:hover {
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+  background: rgba(107, 114, 128, 0.25);
+  border-color: rgba(107, 114, 128, 0.6);
+  box-shadow: 0 8px 24px rgba(107, 114, 128, 0.3), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 30px rgba(107, 114, 128, 0.2);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .promptButtons {
