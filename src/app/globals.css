@@ -26,6 +26,15 @@ body {
   overflow-x: hidden;
 }
 
+/* Enable touch manipulation for mobile */
+html {
+  touch-action: pinch-zoom pan-x pan-y;
+}
+
+body {
+  touch-action: pinch-zoom pan-x pan-y;
+}
+
 * {
   box-sizing: border-box;
 }

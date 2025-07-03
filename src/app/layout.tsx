@@ -23,6 +23,15 @@ export const metadata: Metadata = {
   description: "Interactive visualizations for Retrieval-Augmented Generation systems",
 };
 
+export function generateViewport() {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  }
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{

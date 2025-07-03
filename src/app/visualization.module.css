@@ -10,6 +10,8 @@
   width: 100%;
   height: 100%;
   overflow: auto;
+  touch-action: pinch-zoom pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom scrollbar styles */
@@ -47,6 +49,32 @@
   width: 4500px;
   height: 1600px;
   margin: 0.5rem 4rem 4rem 4rem;
+  transform-origin: 0 0;
+  transition: transform 0.3s ease;
+}
+
+/* Responsive scaling for mobile */
+@media (max-width: 768px) {
+  .diagramContainer {
+    transform: scale(0.3);
+    width: 4500px;
+    height: 1600px;
+    margin: 80px 1rem 2rem 1rem; /* Increased top margin to avoid button overlap */
+  }
+  
+  .scrollWrapper {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .diagramContainer {
+    transform: scale(0.5);
+    width: 4500px;
+    height: 1600px;
+    margin: 70px 2rem 3rem 2rem; /* Adjusted margin for tablet */
+  }
 }
 
 .connectorSvg {
@@ -161,6 +189,24 @@
   gap: 12px;
 }
 
+/* Responsive control buttons for mobile */
+@media (max-width: 768px) {
+  .controlButtons {
+    top: 10px;
+    left: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .controlButtons {
+    top: 15px;
+    left: 15px;
+    gap: 10px;
+  }
+}
+
 .statusButton {
   display: flex;
   align-items: center;
@@ -172,6 +218,23 @@
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
+}
+
+/* Responsive button sizing */
+@media (max-width: 768px) {
+  .statusButton {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    gap: 6px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .statusButton {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    gap: 7px;
+  }
 }
 
 /* Ready State - OpenAI style dark grey/transparent */
@@ -200,6 +263,271 @@
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
   transform: translateY(-1px);
+}
+
+/* Zoom Controls */
+.zoomControls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.zoomButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
+  overflow: hidden;
+}
+
+.zoomButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: inherit;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.zoomButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 
+              0 4px 12px rgba(255, 255, 255, 0.15) inset,
+              0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.zoomButton:hover:not(:disabled)::before {
+  opacity: 0.8;
+}
+
+.zoomButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.zoomButton:disabled::before {
+  opacity: 0.2;
+}
+
+.zoomButton:active:not(:disabled) {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 
+              0 2px 6px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Zoom Dropdown */
+.zoomDropdownContainer {
+  position: relative;
+}
+
+.zoomPercentButton {
+  width: auto !important;
+  min-width: 65px;
+  padding: 0 10px;
+  gap: 4px;
+}
+
+.zoomDropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+              0 8px 24px rgba(0, 0, 0, 0.2),
+              0 2px 8px rgba(255, 255, 255, 0.1) inset;
+  z-index: 1001;
+  min-width: 85px;
+  overflow: hidden;
+  animation: zoomDropdownSlideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes zoomDropdownSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.zoomDropdownItem {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.zoomDropdownItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.zoomDropdownItem:first-child {
+  border-radius: 16px 16px 0 0;
+}
+
+.zoomDropdownItem:last-child {
+  border-radius: 0 0 16px 16px;
+}
+
+.zoomDropdownItem:only-child {
+  border-radius: 16px;
+}
+
+.zoomDropdownItem:hover::before {
+  opacity: 1;
+}
+
+.zoomDropdownItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.zoomDropdownItemActive {
+  background: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2) inset;
+}
+
+.zoomDropdownItemActive::before {
+  background: rgba(59, 130, 246, 0.2);
+  opacity: 1;
+}
+
+.zoomDropdownItemActive:hover {
+  background: rgba(59, 130, 246, 0.5);
+  transform: translateX(2px);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3) inset,
+              0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+/* Responsive zoom controls */
+@media (max-width: 768px) {
+  .zoomControls {
+    bottom: 15px;
+    left: 15px;
+    gap: 6px;
+  }
+  
+  .zoomButton {
+    width: 36px;
+    height: 36px;
+    font-size: 0.7rem;
+    border-radius: 10px;
+  }
+  
+  .zoomPercentButton {
+    min-width: 58px !important;
+    padding: 0 8px !important;
+  }
+  
+  .zoomDropdown {
+    min-width: 75px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  
+  .zoomDropdownItem {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+  
+  .zoomDropdownItem:first-child {
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .zoomDropdownItem:last-child {
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .zoomControls {
+    bottom: 18px;
+    left: 18px;
+    gap: 7px;
+  }
+  
+  .zoomButton {
+    width: 38px;
+    height: 38px;
+    font-size: 0.75rem;
+    border-radius: 11px;
+  }
+  
+  .zoomPercentButton {
+    min-width: 62px !important;
+    padding: 0 9px !important;
+  }
+  
+  .zoomDropdown {
+    min-width: 80px;
+    border-radius: 14px;
+    margin-bottom: 11px;
+  }
+  
+  .zoomDropdownItem {
+    padding: 9px 13px;
+    font-size: 0.75rem;
+  }
+  
+  .zoomDropdownItem:first-child {
+    border-radius: 14px 14px 0 0;
+  }
+  
+  .zoomDropdownItem:last-child {
+    border-radius: 0 0 14px 14px;
+  }
 }
 
 .statusButtonStop:active {

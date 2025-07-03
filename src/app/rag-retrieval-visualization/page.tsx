@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../visualization.module.css';
 import { nodes } from '../data/nodes';
 import UserPrompt from '../components/UserPrompt';
@@ -19,6 +19,8 @@ export default function RAGVisualization() {
   const [researchModel, setResearchModel] = useState<'exa' | 'perplexity' | 'local'>('exa');
   const [showFinalResponseGlow, setShowFinalResponseGlow] = useState(false);
   const [isSimultaneousWorking, setIsSimultaneousWorking] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [showZoomDropdown, setShowZoomDropdown] = useState(false);
 
   // Helper functions for loading state management
   const addLoadingNode = (nodeId: string) => {
@@ -95,6 +97,58 @@ export default function RAGVisualization() {
     // Reload the entire page (like Ctrl+R)
     window.location.reload();
   };
+
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.2, 3)); // Max zoom 3x
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.2, 0.1)); // Min zoom 0.1x
+  };
+
+  const resetZoom = () => {
+    setZoomLevel(1);
+  };
+
+  const setPresetZoom = (zoom: number) => {
+    setZoomLevel(zoom);
+    setShowZoomDropdown(false);
+  };
+
+  const toggleZoomDropdown = () => {
+    setShowZoomDropdown(!showZoomDropdown);
+  };
+
+  // Auto-zoom for small screens
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const screenWidth = window.innerWidth;
+      if (screenWidth <= 768) {
+        setZoomLevel(0.75); // 75% for mobile
+      } else if (screenWidth <= 1024) {
+        setZoomLevel(0.85); // 85% for tablet
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showZoomDropdown) {
+        const target = event.target as Element;
+        if (!target.closest(`.${styles.zoomDropdownContainer}`)) {
+          setShowZoomDropdown(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showZoomDropdown]);
 
   // Wrapper function to track loading state for individual nodes
   const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal, context: string = '') => {
@@ -344,35 +398,6 @@ ${analysisResponse}
 
   return (
     <div className={styles.container}>
-      {/* Mobile/Small Screen Overlay */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl lg:hidden">
-        <div className="relative w-full max-w-md bg-white/5 backdrop-blur-2xl backdrop-saturate-150 border border-white/20 rounded-3xl shadow-2xl shadow-black/50 p-8 text-center before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:via-transparent before:to-transparent before:opacity-50 overflow-hidden">
-          <div className="relative z-10">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center border border-white/20">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Better on Desktop</h2>
-            <p className="text-gray-300 mb-6 leading-relaxed">This RAG visualization works best on larger screens. For the optimal experience, please view on a desktop or tablet.</p>
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                <span className="w-2 h-2 rounded-full bg-green-400/60"></span>
-                <span>Recommended: 1024px+ width</span>
-              </div>
-              <a 
-                href="/"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 rounded-xl text-white font-medium transition-all duration-200 hover:scale-105 backdrop-blur-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Home
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Control Buttons - Top Left */}
       <div className={styles.controlButtons}>
@@ -426,7 +451,7 @@ ${analysisResponse}
       </div>
       
       <div className={styles.scrollWrapper}>
-        <div className={styles.diagramContainer}>
+        <div className={styles.diagramContainer} style={{ transform: `scale(${zoomLevel})` }}>
           {/* SVG Layer for Connectors */}
           <Connectors />
 
@@ -461,6 +486,60 @@ ${analysisResponse}
             }
           })}
         </div>
+      </div>
+
+      {/* Zoom Controls - Bottom Left */}
+      <div className={styles.zoomControls}>
+        <button 
+          className={styles.zoomButton}
+          onClick={handleZoomOut}
+          title="Zoom Out"
+          disabled={zoomLevel <= 0.1}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+            <path d="M8 11h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+        
+        <div className={styles.zoomDropdownContainer}>
+          <button 
+            className={`${styles.zoomButton} ${styles.zoomPercentButton}`}
+            onClick={toggleZoomDropdown}
+            title="Select zoom level"
+          >
+            {Math.round(zoomLevel * 100)}%
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ marginLeft: '4px' }}>
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          {showZoomDropdown && (
+            <div className={styles.zoomDropdown}>
+              {[0.5, 0.75, 1, 1.25, 1.5].map((zoom) => (
+                <button
+                  key={zoom}
+                  className={`${styles.zoomDropdownItem} ${zoomLevel === zoom ? styles.zoomDropdownItemActive : ''}`}
+                  onClick={() => setPresetZoom(zoom)}
+                >
+                  {Math.round(zoom * 100)}%
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <button 
+          className={styles.zoomButton}
+          onClick={handleZoomIn}
+          title="Zoom In"
+          disabled={zoomLevel >= 3}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+            <path d="M8 11h6M11 8v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
       </div>
     </div>
   );
