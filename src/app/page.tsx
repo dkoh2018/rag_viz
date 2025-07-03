@@ -20,7 +20,7 @@ export default function HomePage() {
         {/* Try Demo Button */}
         <Link 
           href="/rag-retrieval-visualization"
-          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-black/40 border border-green-400/30 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-black/60 hover:border-green-400/50 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400/50 active:scale-95 backdrop-blur-md pointer-events-auto shadow-lg shadow-green-400/20 hover:shadow-green-400/40 hover:shadow-xl"
+          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/5 border border-green-400/30 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-white/10 hover:border-green-400/50 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400/50 active:scale-95 backdrop-blur-xl backdrop-saturate-150 pointer-events-auto shadow-lg shadow-green-400/20 hover:shadow-green-400/40 hover:shadow-xl before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-b before:from-white/10 before:to-transparent before:opacity-50"
           aria-label="Try the demo"
         >
           <span>Try Demo</span>
@@ -45,7 +45,7 @@ export default function HomePage() {
         {/* What Can I Do Button */}
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-black/40 border border-white/10 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-black/60 hover:border-white/20 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 active:scale-95 backdrop-blur-md pointer-events-auto"
+          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/5 border border-white/20 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-white/10 hover:border-white/30 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 active:scale-95 backdrop-blur-xl backdrop-saturate-150 pointer-events-auto shadow-lg shadow-black/20 hover:shadow-black/40 before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-b before:from-white/10 before:to-transparent before:opacity-50"
           aria-label="What can I do?"
         >
           <span>What can I do?</span>
