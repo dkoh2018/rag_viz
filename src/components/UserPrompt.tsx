@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { NodeData } from '../data/nodes';
-import styles from '../visualization.module.css';
+import { NodeData } from '@/types';
+import styles from '../styles/visualization.module.css';
 
 interface UserPromptProps {
   node: NodeData;

@@ -1,5 +1,5 @@
-import { NodeData } from '../data/nodes';
-import styles from '../visualization.module.css';
+import { NodeData } from '../config/nodes';
+import styles from '../styles/visualization.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMemo } from 'react';

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from '../visualization.module.css';
-import { nodes } from '../data/nodes';
-import UserPrompt from '../components/UserPrompt';
-import GenerativeNode from '../components/GenerativeNode';
-import Connectors from '../components/Connectors';
+import styles from '../../styles/visualization.module.css';
+import { RAG_NODES as nodes } from '../../config/nodes';
+import UserPrompt from '../../components/UserPrompt';
+import GenerativeNode from '../../components/GenerativeNode';
+import Connectors from '../../components/Connectors';
 import { generateResponse } from '../utils/ragSimulator';
 
 export default function RAGVisualization() {

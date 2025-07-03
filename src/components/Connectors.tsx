@@ -1,4 +1,4 @@
-import styles from '../visualization.module.css';
+import styles from '../styles/visualization.module.css';
 
 export default function Connectors() {
   return (

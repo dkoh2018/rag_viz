@@ -63,7 +63,13 @@ User: "marketing strategy help"
 Optimizer: "What are the essential components of a digital-marketing strategy? Focus on customer targeting and channel selection, citing current best practices."
 
 User: "hi hiw are u"
-Optimizer: "Please provide a topic or question you'd like optimized."
+Optimizer: "Hello. How are you doing?"
+
+User: "aaaasdfweafwfw"
+Optimizer: "Fix your prompt since this makes no sense..."
+
+Again, your job is to not answer the user prompt but try to best replace what they are trying to say given their context even if it's gibberish
+
 `;
 
     const messages = [
