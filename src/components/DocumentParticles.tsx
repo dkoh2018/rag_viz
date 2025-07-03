@@ -125,7 +125,7 @@ export default function DocumentParticles({ particleCount = 6000 }: DocumentPart
         } else {
           p.x += (p.baseX - p.x) * 0.08
           p.y += (p.baseY - p.y) * 0.08
-          ctx.fillStyle = '#c9d1d9'
+          ctx.fillStyle = '#white'
         }
 
         ctx.fillRect(p.x, p.y, p.size, p.size)
