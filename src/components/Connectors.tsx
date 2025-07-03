@@ -18,27 +18,27 @@ export default function Connectors() {
       </defs>
 
       {/* Connector paths */}
-      <path d="M 480 250 L 590 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1060 250 L 2725 250" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="1250" y="230" className={styles.connectorLabel}>Simple Query</text>
-      <path d="M 825 450 L 825 560" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="730" y="510" className={styles.connectorLabel}>Complex Query</text>
-      <path d="M 825 950 L 825 990 L 1035 990 L 1035 1080" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1280 1210 Q 1330 1210, 1350 860 T 1430 470" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1280 1210 Q 1330 1210, 1350 1040 T 1430 870" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1280 1210 Q 1320 1210, 1430 1270" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1930 470 Q 2000 620 2100 625" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1930 870 L 2100 675" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 1930 1270 Q 2000 1120 2100 725" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 2350 850 L 2350 890" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 2600 1050 L 2725 890" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 3100 450 Q 3120 450 3300 540" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 3100 680 Q 3120 680 3300 580" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="3180" y="620" className={styles.connectorLabel}>Valid</text>
-      <path d="M 3790 570 L 3930 570" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <path d="M 2975 1050 L 2975 1500 L 700 1500 L 700 945" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
-      <text x="2865" y="1125" className={styles.connectorLabel}>Needs Refinement</text>
-      <text x="575" y="1000" className={styles.connectorLabel}>Needs Refinement</text>
+      <path d="M 480 300 L 590 300" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1060 300 L 2725 300" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <text x="1250" y="280" className={styles.connectorLabel}>Simple Query</text>
+      <path d="M 825 500 L 825 610" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <text x="730" y="560" className={styles.connectorLabel}>Complex Query</text>
+      <path d="M 825 1000 L 825 1040 L 1035 1040 L 1035 1130" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1280 1260 Q 1330 1260, 1350 910 T 1430 520" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1280 1260 Q 1330 1260, 1350 1090 T 1430 920" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1280 1260 Q 1320 1260, 1430 1320" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1930 520 Q 2000 670 2100 675" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1930 920 L 2100 725" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 1930 1320 Q 2000 1170 2100 775" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 2350 900 L 2350 940" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 2600 1100 L 2725 940" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 3100 500 Q 3120 500 3300 590" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 3100 730 Q 3120 730 3300 630" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <text x="3180" y="670" className={styles.connectorLabel}>Valid</text>
+      <path d="M 3790 620 L 3930 620" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <path d="M 2975 1100 L 2975 1550 L 700 1550 L 700 995" stroke="#484f58" strokeWidth="2" fill="none" markerEnd="url(#arrow)" />
+      <text x="2865" y="1175" className={styles.connectorLabel}>Needs Refinement</text>
+      <text x="575" y="1050" className={styles.connectorLabel}>Needs Refinement</text>
     </svg>
   );
 }

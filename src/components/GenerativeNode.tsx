@@ -79,7 +79,7 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
       {/* Dual badge router agent display */}
       {routerDisplayInfo && (
         <div className={styles.routerOverlay}>
-          {routerDisplayInfo.showBoth ? (
+          {routerDisplayInfo.showBoth && routerDisplayInfo.badges ? (
             // Show both badges initially
             <div className={styles.routerDualBadges}>
               {routerDisplayInfo.badges.map((badge, index) => (
@@ -89,13 +89,13 @@ export default function GenerativeNode({ node, generatedContent, isLoading = fal
                 </div>
               ))}
             </div>
-          ) : (
+          ) : routerDisplayInfo.activeBadge ? (
             // Show only the active badge after processing
             <div className={`${styles.routerBadge} ${routerDisplayInfo.activeBadge.className} ${styles.routerBadgeActive}`}>
               <span className={styles.routerIcon}>{routerDisplayInfo.activeBadge.icon}</span>
               <span className={styles.routerType}>{routerDisplayInfo.activeBadge.type}</span>
             </div>
-          )}
+          ) : null}
         </div>
       )}
       <div className={styles.nodeLabel}>
