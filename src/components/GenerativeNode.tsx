@@ -1,4 +1,4 @@
-import { NodeData } from '../config/nodes';
+import { NodeData } from '@/types';
 import styles from '../styles/visualization.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
