@@ -3,10 +3,12 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import DocumentParticles from '@/components/DocumentParticles'
-import WhatCanIDoModal from '@/components/WhatCanIDoModal'
+import WhatCanIDo from '@/components/WhatCanIDo'
+import styles from '@/styles/visualization.module.css'
 
 export default function HomePage() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFaqOpen, setIsFaqOpen] = useState(false)
+  
   return (
     <div className="relative w-full h-dvh overflow-hidden bg-gradient-to-br from-[#1a1d23] via-[#21262d] to-[#1a1d23]">
       
@@ -16,62 +18,45 @@ export default function HomePage() {
       </div>
       
       {/* Buttons - Top Left */}
-      <div className="absolute top-6 left-6 flex gap-3 pointer-events-none">
+      <div className="absolute top-6 left-6 flex gap-3 z-50">
         {/* Try Demo Button */}
         <Link 
           href="/rag-retrieval-visualization"
-          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/5 border border-green-400/30 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-white/10 hover:border-green-400/50 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400/50 active:scale-95 backdrop-blur-xl backdrop-saturate-150 pointer-events-auto shadow-lg shadow-green-400/20 hover:shadow-green-400/40 hover:shadow-xl before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-b before:from-white/10 before:to-transparent before:opacity-50"
+          className={`${styles.statusButton} ${styles.tryDemoButton}`}
           aria-label="Try the demo"
         >
           <span>Try Demo</span>
-          <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center transition-all duration-200 group-hover:bg-white/30 group-hover:translate-x-0.5">
-            <svg 
-              className="w-2.5 h-2.5" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              aria-hidden="true"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                d="M9 5l7 7-7 7" 
-              />
-            </svg>
-          </div>
+          <svg 
+            width="20" 
+            height="20" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            aria-hidden="true"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M13 7l5 5m0 0l-5 5m5-5H6" 
+            />
+          </svg>
         </Link>
 
         {/* What Can I Do Button */}
         <button 
-          onClick={() => setIsModalOpen(true)}
-          className="group relative inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-white/5 border border-white/20 text-white/90 font-medium text-sm tracking-tight transition-all duration-200 ease-out hover:bg-white/10 hover:border-white/30 hover:text-white hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 active:scale-95 backdrop-blur-xl backdrop-saturate-150 pointer-events-auto shadow-lg shadow-black/20 hover:shadow-black/40 before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-b before:from-white/10 before:to-transparent before:opacity-50"
+          onClick={() => setIsFaqOpen(true)}
+          className={`${styles.statusButton} ${styles.resetButton}`}
           aria-label="What can I do?"
         >
           <span>What can I do?</span>
-          <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center transition-all duration-200 group-hover:bg-white/30 group-hover:translate-x-0.5">
-            <svg 
-              className="w-2.5 h-2.5" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              aria-hidden="true"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                d="M9 5l7 7-7 7" 
-              />
-            </svg>
-          </div>
         </button>
       </div>
 
-      {/* Modal */}
-      <WhatCanIDoModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      {/* What Can I Do */}
+      <WhatCanIDo 
+        isOpen={isFaqOpen} 
+        onClose={() => setIsFaqOpen(false)} 
       />
       
     </div>
