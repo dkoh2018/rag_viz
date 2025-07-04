@@ -101,11 +101,11 @@ export default function RAGVisualization() {
   };
 
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.2, 3)); // Max zoom 3x
+    setZoomLevel(prev => Math.min(prev + 0.2, 1.5)); // Max zoom 1.5x (150%)
   };
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.2, 0.1)); // Min zoom 0.1x
+    setZoomLevel(prev => Math.max(prev - 0.2, 0.3)); // Min zoom 0.3x (30%)
   };
 
 
@@ -161,6 +161,25 @@ export default function RAGVisualization() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showZoomDropdown, showModelDropdown]);
+
+  // Keyboard shortcuts for zoom controls
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl/Cmd + Plus/Equals for zoom in
+      if ((event.ctrlKey || event.metaKey) && (event.key === '+' || event.key === '=')) {
+        event.preventDefault();
+        handleZoomIn();
+      }
+      // Check for Ctrl/Cmd + Minus for zoom out
+      else if ((event.ctrlKey || event.metaKey) && event.key === '-') {
+        event.preventDefault();
+        handleZoomOut();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [zoomLevel]);
 
   // Wrapper function to track loading state for individual nodes
   const generateResponseWithLoading = async (nodeId: string, prompt: string, checkShouldStop: () => boolean, signal: AbortSignal, context: string = '') => {
@@ -538,7 +557,7 @@ ${analysisResponse}
           className={styles.zoomButton}
           onClick={handleZoomOut}
           title="Zoom Out"
-          disabled={zoomLevel <= 0.1}
+          disabled={zoomLevel <= 0.3}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
