@@ -81,7 +81,7 @@ export default function WhatCanIDo({ isOpen, onClose }: WhatCanIDoProps) {
                 <div className="flex-1">
                   <h4 className="text-lg font-medium text-white/95 mb-2">Ask Your Question</h4>
                   <p className="text-white/70 text-sm leading-relaxed">
-                    Enter any question you'd like to see processed through the RAG pipeline
+                    Enter any question you&apos;d like to see processed through the RAG pipeline
                   </p>
                 </div>
               </div>
